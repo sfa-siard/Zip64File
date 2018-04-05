@@ -15,15 +15,15 @@ Created    : 16.04.2010, Hartwig Thomas
   <property name="target" value="1.7"/>
   <property name="source" value="1.7"/>
   <!-- the main folders of the project -->
-  <property name="dirsrc" location="src"/>
-  <property name="dirtest" location="test/"/>
-  <property name="dirlib" location="lib"/>
-  <property name="dirdoc" location="doc"/>
-  <property name="diretc" location="etc"/>
-  <property name="dirvar" location="var"/>
-  <property name="dirtmp" location="tmp"/>
-  <property name="dirdist" location="dist"/>
-  <property name="dirjavadoc" location="${dirdoc}/javadoc"/>
+  <property name="dirsrc" value="src"/>
+  <property name="dirtest" value="test/"/>
+  <property name="dirlib" value="lib"/>
+  <property name="dirdoc" value="doc"/>
+  <property name="diretc" value="etc"/>
+  <property name="dirvar" value="var"/>
+  <property name="dirtmp" value="tmp"/>
+  <property name="dirdist" value="dist"/>
+  <property name="dirjavadoc" value="${dirdoc}/javadoc"/>
   <!-- enter utils jar -->
   <property name="jarenterutils" value="enterutils.jar"/>
   <property name="cpenterutils" value="${dirlib}/${jarenterutils}"/>
@@ -34,9 +34,9 @@ Created    : 16.04.2010, Hartwig Thomas
 
   <!-- clean deletes all build artefacts -->
   <!-- delete build folders -->
-  <property name="dirbuild" location="build"/>
-  <property name="dirbuildclasses" location="${dirbuild}/classes"/>
-  <property name="dirbuildtests" location="${dirbuild}/tests"/>
+  <property name="dirbuild" value="build"/>
+  <property name="dirbuildclasses" value="${dirbuild}/classes"/>
+  <property name="dirbuildtests" value="${dirbuild}/tests"/>
   <target name="clean">
     <echo message="${ant.project.name}: clean"/>
     <delete dir="${dirbuildclasses}"/>
