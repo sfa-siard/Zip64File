@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- ===================================================================
+Developers' Manual of Zip64File: Architecture
+Application: SIARD Suite 2.1
+Platform   : HTML5
+========================================================================
+Copyright  : Enter AG, Joweid Zentrum 1, 8036 Rüti ZH, Switzerland, 2018
+==================================================================== -->
+  <head>
+    <title>Zip64File - Developers' Manual - Architecture</title>
+    <!-- character set -->
+    <meta charset="utf-8" />
+    <!-- Icon -->
+    <link rel="icon" type="image/gif" href="../assets/img/icon.gif" />
+    <!-- Global style sheet -->
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/print.css">
+    <link rel="stylesheet" href="../assets/css/siard.css" />
+  </head>
+  <body>
+
+    <div class="container container-main">
+      <header>
+        <div class="clearfix">
+          <div class="table-row">
+            <span class="header-logo">
+              <img src="../assets/img/swiss.svg" onerror="this.onerror=null; this.src='../assets/img/swiss.png'" alt="Confederatio Helvetica" />
+            </span>
+            <h1 class="header-title">Zip64File - Developers' Manual</h1>
+          </div>
+        </div>
+      </header>
+      
+      <div class="nav-main navbar" id="main-navigation"></div>
+    
+      <div class="container-fluid hidden-xs">
+        <div class="row">
+          <div class="col-sm-12">
+            <h2 id="br1" class="hidden">Breadcrumbs</h2>
+            <ol class="breadcrumb" role="navigation" aria-labelledby="br1">
+              <li><a href="./index.html">Zip64File - Developers' Manual</a><span class="icon icon--greater"></span></li>
+              <li class="active" aria-selected="true">Architecture</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-12 main-column" id="content" role="main">
+            <div class="contentHead">
+              <div class="mod mod-contentpage">
+                <h1>Zip64File - Developers' Manual - Architecture</h1>
+              </div>
+            </div>  
+            <div class="mod mod-text">
+              <section class="clearfix">
+                <h2>Architecture</h2>
+                <p>The project <em>Zip64File</em> is part of the 
+                <em>SIARD (Software-Independent Archival of Relational Databases) Suite</em>.
+                The description of its architecture has two parts:</p>
+                <ul>
+                  <li>Global architecture of <em>SIARD Suite</em> and the position of <em>Zip64File</em> in it,</li>
+                  <li>Local architecture of <em>Zip64File</em>. 
+                </ul>
+                
+                <p class="pull-right">
+                  <small>
+                    <a href="#" class="icon icon--before icon--power hidden-print">Top of page</a>
+                  </small>
+                </p>
+                
+                <h3>Global Architecture</h3>
+                
+                <p>The SIARD project interacts with files containing 
+                  archived relational databases in the SIARD Format 2.1 
+                  using the SIARD API.</p>
+                <p>The SIARD project interacts with relational databases 
+                  using the <a href="http://download.oracle.com/otndocs/jcp/jdbc-4_1-mrel-spec/index.html" target="_blank">JDBC API (4.1)</a> 
+                  and the <a href="https://en.wikibooks.org/wiki/Structured_Query_Language" target="_blank">SQL:2008 standard</a>.</p>
+                
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+
+                <h4>SIARD Runtime Architecture</h4>
+                <img src="siard-runtime.png" alt="SIARD Runtime Architecture"/>
+                <p>Standards are bold and italics. The modules implement them.</p>
+
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+                
+                <h4>SIARD Development Architecture</h4>
+                <p>The SIARD project is based on the following sub-projects:</p>
+                <dl>
+                  <dt>SiardGui</dt>
+                  <dd>graphical user interface for downloading and uploading relational databases and editing their metadata</dd>
+                  <dt>SiardCmd</dt>
+                  <dd>command-line executables for downloading and uploading relational databases</dd>
+                  <dt>SiardApi</dt>
+                  <dd>API for reading an writing files in the SIARD Format 2.1</dd>
+                  <dt class="bg-info">Zip64File</dt>
+                  <dd class="bg-info">implementation of the ZIP 64 standard</dd>
+                  <dt>JdbcAccess</dt>
+                  <dd>JDBC interface (pure Java) to MS Access databases</dd>
+                  <dt>JdbcDb2</dt>
+                  <dd>JDBC interface to DB/2 databases</dd>
+                  <dt>JdbcH2</dt>
+                  <dd>JDBC interface to H2 databases</dd>
+                  <dt>JdbcMsSql</dt>
+                  <dd>JDBC interface to MS SQL Server databases</dd>
+                  <dt>JdbcMySql</dt>
+                  <dd>JDBC interface to MySql databases</dd>
+                  <dt>JdbcOracle</dt>
+                  <dd>JDBC interface to Oracle databases</dd>
+                  <dt>JdbcBase</dt>
+                  <dd>base classes for all JDBC 4.1 implementations</dd>
+                  <dt>SqlParser</dt>
+                  <dd>SQL:2008 Parser</dd>
+                  <dt>EnterUtilities</dt>
+                  <dd>various small utilities used by most projects</dd>
+                </dl>
+                <p>These projects depend on each other:</p>
+                <img src="siard-projects.png" alt="SIARD Projects"/>
+                <p><em>Zip64File</em> is implemented as a separate
+                  project, because a a general ZIP64 file handler
+                  can be quite useful in its own right in other contexts
+                  than SIARD.</p> 
+                
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+                
+                <h3>Local Architecture</h3>
+                <h4>The ZIP File Format and Zip64File</h4>
+                <p>The ZIP file contents are files and directories which 
+                  are stored in arbitrary order. The location of a file is 
+                  indicated in the so called central directory which is 
+                  located a the end of the ZIP file. The files and directories 
+                  are represented by file entries. Besides the file data each 
+                  file entry contains a header with proprietary information 
+                  about the file entry such as the comment, file size, 
+                  whether it is a directory or a file, and of course the 
+                  file name. The central directory carries for each file 
+                  a file header with the relative offset of the local header.</p>
+                <img src="zipformat.png" alt="ZIP File Format"/>
+                <p>The figure above suggests sequential order nevertheless 
+                  the file entries may be distributed arbitrarily and 
+                  the order in the file section and in the central 
+                  directory can be different.</p>
+                <p>The <em>Zip64File</em> constructor reads all entries 
+                  in the central directory when a new instance is initialized.</p>
+                <p>The central directory entries contain the absolute 
+                  offset of the local headers for each file entry. 
+                  The <em>Zip64File</em> instance holds a list of the 
+                  file entries and each file can be accessed directly 
+                  without streaming through the whole ZIP file.</p>
+                <p>Whereas the ZIP file format specification supports file 
+                  spanning on multiple disks, splitting, and encryption, 
+                  <em>Zip64File</em> does not.
+                
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+                
+                <h4>The Zip64File Class</h4>
+                <p>The <em>Zip64File</em> class contains the constructors and 
+                  methods for the most prevalent operations like opening, 
+                  reading, and writing the ZIP file and its file entries.</p>
+                <p>Whereas the ZIP file format specification does support 
+                  file spanning on multiple disks, splitting, and encryption 
+                  <em>Zip64File</em> does not.</p>
+                <h5>Constructors</h5>
+                <p>All constructors take at least the filename or the I/O 
+                  file of the ZIP file as an argument. "disk file" is a 
+                  synonym for a seekable ZIP file on the disk. All instances 
+                  of <em>Zip64File</em> are random access files.</p>
+                <h4>The FileEntry Class</h4>
+                <p>The file entry class basically contains the information 
+                  stored in the local header as specified.</p>
+                <h5>Constructor</h5>
+                <p>The constructor is only needed when a new file entry 
+                  has to be created. In other respects, the file entries 
+                  are accessed and manipulated with the methods of the 
+                  <em>Zip64File</em> class
+                <h4>The EntryInputStream and EntryOutputStream Classes</h4>
+                <p>These classes provide reading form ZIP file entry data 
+                  by using the <em>InputStream</em> or writing by using 
+                  <em>OutputStream</em> just as if it were a regular stream.</p>
+                <p>Only one <em>EntryOutputStream</em> stream can be opened 
+                  at a time.</p>
+                <p>To create a directory use the <em>EntryOutputStream</em>
+                  constructor with a trailing slash in the file specification 
+                  string argument. Also zero bytes should be written to 
+                  the directory stream.</p>
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="container-fluid">
+          <hr class="footer-line">
+          <img src="../assets/img/logo-CH.svg" onerror="this.onerror=null; this.src='../assets/img/logo-CH.png'" />
+          <h1 class="hidden-xs">Swiss Federal Archives</h1>
+          <p class=pull-right><a href="../../../LICENSE.txt">License</a></p>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

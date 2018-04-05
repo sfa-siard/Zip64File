@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- $Workfile: build.xml $ ============================================
+ANT build file of zip64.
+Application: ZIP Utilities
+Description: ANT build file of zip64.
+Platform   : JAVA, ANT
+========================================================================
+Copyright  : Enter AG, Zurich, Switzerland, 2010
+Created    : 16.04.2010, Hartwig Thomas
+==================================================================== -->
+<project basedir="." default="build" name="zip64">
+  <property file="build.properties"/>
+  
+  <property name="debuglevel" value="source,lines,vars"/>
+  <property name="target" value="1.7"/>
+  <property name="source" value="1.7"/>
+  <!-- the main folders of the project -->
+  <property name="dirsrc" location="src"/>
+  <property name="dirtest" location="test/"/>
+  <property name="dirlib" location="lib"/>
+  <property name="dirdoc" location="doc"/>
+  <property name="diretc" location="etc"/>
+  <property name="dirvar" location="var"/>
+  <property name="dirtmp" location="tmp"/>
+  <property name="dirdist" location="dist"/>
+  <property name="dirjavadoc" location="${dirdoc}/javadoc"/>
+  <!-- enter utils jar -->
+  <property name="jarenterutils" value="enterutils.jar"/>
+  <property name="cpenterutils" value="${dirlib}/${jarenterutils}"/>
+  <!-- junit -->
+	<property name="jarhamcrest" value="hamcrest-core-1.3.jar"/>
+	<property name="jarjunit4" value="junit-4.12.jar"/>
+  <property name="cpjunit" value="${dirlib}/${jarhamcrest};${dirlib}/${jarjunit4}"/>
+
+  <!-- clean deletes all build artefacts -->
+  <!-- delete build folders -->
+  <property name="dirbuild" location="build"/>
+  <property name="dirbuildclasses" location="${dirbuild}/classes"/>
+  <property name="dirbuildtests" location="${dirbuild}/tests"/>
+  <target name="clean">
+    <echo message="${ant.project.name}: clean"/>
+    <delete dir="${dirbuildclasses}"/>
+    <delete dir="${dirbuildtests}"/>
+    <delete dir="${dirtmp}"/>
+    <delete dir="${dirdist}"/>
+    <delete dir="${dirjavadoc}"/>
+  </target>
+  
+  <!-- create build folders -->
+  <target name="init" depends="clean">
+    <echo message="${ant.project.name}: init"/>
+    <mkdir dir="${dirbuild}"/>
+    <mkdir dir="${dirbuildclasses}"/>
+    <mkdir dir="${dirbuildtests}"/>
+    <mkdir dir="${dirtmp}"/>
+    <mkdir dir="${dirdist}"/>
+    <mkdir dir="${dirjavadoc}"/>
+  </target>
+  
+  <!-- check if mainfest and local build properties are available -->
+  <property name="filemanifest" value="${dirsrc}/META-INF/MANIFEST.MF"/>
+  <property name="filerevoldproperties" value="${dirtmp}/revold.properties"/>
+  <property name="filegithead" value=".git/HEAD"/>
+  <property name="filebranchproperties" value="${dirtmp}/branch.properties"/>
+  <target name="check">
+    <!-- get current date -->
+    <tstamp>
+      <format property="builtdate" pattern="dd. MMM yyyy" locale="en,CH"/>
+    </tstamp>
+    <echo message="builddate: ${builtdate}"/>
+    <!-- current version and revision are taken from manifest -->
+    <copy file="${filemanifest}" tofile="${filerevoldproperties}"/>
+    <!-- reduce it to version and revision properties --> 
+    <replaceregexp file="${filerevoldproperties}" 
+      match=".*Implementation-Version: (\d+\.\d+)\.(\d+).*" 
+      replace="version=\1&#x000A;revold=\2"
+      flags="gms"/>
+    <!-- load the properties -->
+    <property file="${filerevoldproperties}"/>
+    <echo message="version: ${version}"/>
+    <echo message="revold: ${revold}"/>
+    <!-- fail if build.properties are not configured -->
+    <fail  message="External build.properties not configured correctly!">
+      <condition>
+        <not>
+          <and>
+            <isset property="version"/>
+            <isset property="revold"/>
+            <isset property="java7rtjar"/>
+          </and>
+        </not>
+      </condition>
+    </fail>
+    <!-- check .git/HEAD for active branch name -->
+    <copy file="${filegithead}" tofile="${filebranchproperties}"/>
+    <!-- reduce it to branch property -->
+    <replaceregexp file="${filebranchproperties}" 
+      match="^ref: refs/heads/(.*)$" 
+      replace="branch=\1"
+      flags="gms"/>
+    <!-- load the property -->
+    <property file="${filebranchproperties}"/>
+    <!-- compute branch.master -->
+    <condition property="branch.master">
+      <and>
+        <not><isset property="submit"/></not> 
+        <equals arg1="${branch}" arg2="master"/>
+      </and>
+    </condition>
+    <echo message="branch: ${branch}"/>
+    <echo message="branch.master: ${branch.master}"/>
+    <echo message="build.properties.configured: ${build.properties.configured}"/>
+  </target>
+	
+  <!-- commit local work -->
+  <property name="fileadd" value="${dirtmp}/add.txt"/>
+  <property name="filecommit" value="${dirtmp}/commit.txt"/>
+  <target name="commit" depends="check" if="git">
+  	<echo message="get recent SIARD JARs"/>
+    <!-- TODO: get most recently released version of enterutils.jar -->
+    <copy file="../EnterUtilities/dist/enterutils.jar" todir="${dirlib}" failonerror="false"/>
+    <echo message="${ant.project.name}: git add -A"/>
+    <exec executable="${git}" output="${fileadd}" failonerror="true">
+      <arg value="add"/>
+      <arg value="-A"/>
+    </exec>
+    <echo message="${ant.project.name}: git commit -am &quot;${version}.${revold}&quot;"/>
+    <exec executable="${git}" output="${filecommit}">
+      <arg value="commit"/>
+      <arg value="-am" />
+      <arg value="${version}.${revold}" />
+    </exec>
+  </target>
+  
+  <!-- update from remote master -->
+  <property name="filepull" value="${dirtmp}/pull.txt"/>
+  <target name="pull" depends="commit" if="git">
+    <!-- pull master branch
+    <echo message="${ant.project.name}: git pull origin master"/>
+    <exec executable="${git}" output="${filepull}">
+      <arg value="pull"/>
+      <arg value="origin"/>
+      <arg value="master"/>
+    </exec>
+    -->
+    <!-- pull dev branch -->
+    <echo message="${ant.project.name}: git pull origin ${branch}"/>
+    <exec executable="${git}" output="${filepull}" failonerror="true">
+      <arg value="pull"/>
+      <arg value="origin"/>
+      <arg value="${branch}"/>
+    </exec>
+  </target>
+  
+  <!-- increment revision and update manifests -->
+  <property name="filerevisionproperties" value="${dirtmp}/revision.properties"/>
+  <target name="revision" depends="pull">
+    <echo message="${ant.project.name}: revision"/>
+    <copy file="${filerevoldproperties}" tofile="${filerevisionproperties}" overwrite="true"/>
+    <replaceregexp file="${filerevisionproperties}" 
+      match="^revold=(.*)$" 
+      replace="revision=\1"
+      flags="gm"/>
+    <propertyfile file="${filerevisionproperties}">
+      <entry key="revision" type="int" operation="+" value="1"/>
+    </propertyfile>
+    <property file="${filerevisionproperties}"/>
+    <echo message="revision: ${revision}" />
+    <replaceregexp file="${filemanifest}" 
+      match="^Implementation-Version: .*$" 
+      replace="Implementation-Version: ${version}.${revision}"
+      flags="gm"/>
+    <replaceregexp file="${filemanifest}" 
+      match="^Built-Date: .*$" 
+      replace="Built-Date: ${builtdate}"
+      flags="gm"/>
+  </target>
+  
+  <!-- build the Zip64File classes -->
+  <target name="build" depends="init,revision">
+    <echo message="${ant.project.name}: build"/>
+    <!-- without this, the package-info class is not generated! -->
+    <touch>
+      <fileset dir="${dirsrc}" includes="**/*.*"/>
+    </touch>
+    <javac debug="true" debuglevel="${debuglevel}"
+      includeantruntime="false"
+      bootclasspath="${java7rtjar}"
+      source="${source}" 
+      target="${target}"
+      encoding="UTF-8"
+      classpath="${cpenterutils}"
+      srcdir="${dirsrc}"
+      destdir="${dirbuildclasses}">
+    </javac>
+  </target>
+  
+  <!-- create the JAR file containing all classes -->
+  <property name="jarfile" value="${ant.project.name}.jar"/>
+  <target name="jar" depends="build">
+    <echo message="${ant.project.name}: jar"/>
+    <jar jarfile="${dirdist}/${jarfile}"
+       manifest="${filemanifest}">
+      <fileset dir="${dirbuildclasses}">
+        <include name="**/*.class"/>
+        <include name="**/res/*.*"/>
+      </fileset>
+    </jar>
+  </target>
+  
+  <!-- test target runs the tests in zip64Tester -->
+	<property name="classzip64tester" value="ch.enterag.utils.zip.zip64Tester"/>
+  <property name="filezip64test" value="zip64-test"/>
+	<property name="classeistester" value="ch.enterag.utils.zip.EntryInputStreamTester"/>
+	<property name="fileeistest" value="eis-test"/>
+  <target name="test" depends="jar">
+    <echo message="${ant.project.name}: test ${cpenterutils};${dirdist}/${jarfile};${cpjunit}"/>
+    <!-- build the tests -->
+    <javac debug="true" debuglevel="${debuglevel}"
+      includeantruntime="false"
+      bootclasspath="${java7rtjar}"
+      source="${source}" 
+      target="${target}"
+      encoding="UTF-8"
+      classpath="${cpjunit};${dirdist}/${jarfile}"
+      srcdir="${dirtest}"
+      destdir="${dirbuildtests}">
+      <classpath>
+        <pathelement path="${cpenterutils}"/>
+        <pathelement path="${dirdist}/${jarfile}"/>
+        <pathelement path="${cpjunit}"/>
+      </classpath>
+    </javac>
+    <!-- run the tests -->
+    <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+      <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
+      <formatter type="plain"/>
+      <classpath>
+        <pathelement path="${dirbuildtests}"/>
+        <pathelement path="${cpenterutils}"/>
+        <pathelement path="${dirdist}/${jarfile}"/>
+        <pathelement path="${cpjunit}"/>
+      </classpath>
+      <test 
+      name="${classzip64tester}"
+      outfile="${filezip64test}"
+        todir="${dirtmp}"/>
+    </junit>
+    <sleep milliseconds="10"/> 
+  	<!--
+    <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+      <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
+      <formatter type="plain"/>
+      <classpath>
+        <pathelement path="${dirbuildtests}"/>
+        <pathelement path="${cpenterutils}"/>
+        <pathelement path="${dirdist}/${jarfile}"/>
+        <pathelement path="${cpjunit}"/>
+      </classpath>
+      <test 
+      name="${classeistester}"
+      outfile="${fileeistest}"
+        todir="${dirtmp}"/>
+    </junit>
+    -->
+  </target>
+  
+  <!-- generate the javadocs -->
+  <property name="zippackage" value="ch.enterag.utils.zip"/>
+  <property name="packages" value="${zippackage}"/>
+  <target name="javadoc" depends="test">
+    <echo message="${ant.project.name}: javadoc"/>
+    <javadoc 
+      access="public" 
+      author="true" 
+      classpath="${cpenterutils}"
+      destdir="${dirjavadoc}" 
+      doctitle="ZIP64" 
+      packagenames="${packages}"
+      nodeprecated="false" 
+      nodeprecatedlist="false" 
+      noindex="false" 
+      nonavbar="false" 
+      notree="false" 
+      source="${source}" 
+      sourcepath="${dirsrc}"
+      splitindex="true" 
+      use="true" 
+      version="true"/>
+  </target>
+  
+  <target name="zip" depends="javadoc">
+    <echo message="${ant.project.name}: zip"/>
+    <zip zipfile="${dirdist}/${ant.project.name}-${version}.${revision}.zip">
+      <zipfileset dir="${dirdist}" prefix="${ant.project.name}/${dirlib}">
+        <include name="${jarfile}"/>
+      </zipfileset>
+      <zipfileset dir="${dirlib}" prefix="${ant.project.name}/${dirlib}">
+      	<exclude name="${jarhamcrest}"/>
+      	<exclude name="${jarjunit4}"/>
+      </zipfileset>
+      <zipfileset dir="${dirdoc}" prefix="${ant.project.name}/${dirdoc}">
+        <include name="**/*.*"/>
+        <exclude name="developer/**/*.*"/>
+      </zipfileset>
+      <zipfileset dir="${diretc}" prefix="${ant.project.name}/${diretc}">
+        <exclude name="debug.properties"/>
+      </zipfileset>
+      <zipfileset dir="." prefix="${ant.project.name}">
+        <include name="*.txt"/>
+      </zipfileset>
+   	</zip>
+  </target>
+	
+  <!-- push to remote dev branch -->
+  <property name="filepush" value="${dirtmp}/push.txt"/>
+  <target name="push" depends="zip" if="git" unless="branch.master">
+    <!-- commit -->
+    <echo message="${ant.project.name}: git commit -am &quot;Build: ${version}.${revision}&quot;"/>
+    <exec executable="${git}" output="${filecommit}" failonerror="true">
+      <arg value="commit"/>
+      <arg value="-am" />
+      <arg value="Build: ${version}.${revision}" />
+    </exec>
+    <!-- push to remote -->
+    <echo message="${ant.project.name}: git push origin ${branch}"/>
+    <exec executable="${git}" output="${filepush}" failonerror="true">
+      <arg value="push"/>
+      <arg value="origin"/>
+      <arg value="${branch}"/>
+    </exec>
+  </target>
+  
+  <!-- deploy to file system -->
+  <target name="deploy" depends="push" if="dirdeploy">
+    <echo message="${ant.project.name}: deploy"/>
+    <delete dir="${dirdeploy}/${ant.project.name}"/>
+    <unzip dest="${dirdeploy}" src="${dirdist}/${ant.project.name}-${version}.${revision}.zip" />
+  </target>
+  
+</project>

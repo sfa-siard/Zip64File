@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- ===================================================================
+Users' Manual of Zip64File: Usage
+Application: SIARD Suite 2.1
+Platform   : HTML5
+========================================================================
+Copyright  : Enter AG, Joweid Zentrum 1, 8036 Rüti ZH, Switzerland, 2018
+==================================================================== -->
+  <head>
+    <title>Zip64File - Users' Manual - Usage</title>
+    <!-- character set -->
+    <meta charset="utf-8" />
+    <!-- Icon -->
+    <link rel="icon" type="image/gif" href="../assets/img/icon.gif" />
+    <!-- Global style sheet -->
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/print.css">
+    <link rel="stylesheet" href="../assets/css/siard.css" />
+  </head>
+  <body>
+
+    <div class="container container-main">
+      <header>
+        <div class="clearfix">
+          <div class="table-row">
+            <span class="header-logo">
+              <img src="../assets/img/swiss.svg" onerror="this.onerror=null; this.src='../assets/img/swiss.png'" alt="Confederatio Helvetica" />
+            </span>
+            <h1 class="header-title">Zip64File - Users' Manual</h1>
+          </div>
+        </div>
+      </header>
+      
+      <div class="nav-main navbar" id="main-navigation"></div>
+    
+      <div class="container-fluid hidden-xs">
+        <div class="row">
+          <div class="col-sm-12">
+            <h2 id="br1" class="hidden">Breadcrumbs</h2>
+            <ol class="breadcrumb" role="navigation" aria-labelledby="br1">
+              <li><a href="./index.html">Zip64File - Users' Manual</a><span class="icon icon--greater"></span></li>
+              <li class="active" aria-selected="true">Usage</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-12 main-column" id="content" role="main">
+            <div class="contentHead">
+              <div class="mod mod-contentpage">
+                <h1>Zip64File - Users' Manual - Usage</h1>
+              </div>
+            </div>  
+            <div class="mod mod-text">
+              <section class="clearfix">
+                <h2>Usage</h2>
+                <p>It is recommended to call the ZIP64 binary using its 
+                  full path name. Knowledgeable users may add that path 
+                  name to their PATH environment variable. It is then 
+                  their responsibility to resolve possible collisions 
+                  with other binaries of the same name.</p>
+                <p>The zip64 command-line is called like this:</p>
+                <pre>java -jar &lt;zip64path&gt;/lib/zip64.jar &lt;command&gt; options &lt;zipfile&gt; files...</pre>
+                
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+                
+                <h3>Command</h3>
+                <p>The command defines the basic operation executed by <em>zip64</em>.
+                  It must be one of the following:</p>
+                <dl>
+                  <dt><strong>n</strong></dt><dd>for inject overwrites and existing archive or creates a new archive, adding the files,</dd>
+                  <dt><strong>x</strong></dt><dd>for extract extracts the files from the archive, or</dd>
+                  <dt><strong>l</strong></dt><dd>for list lists the files in the archive.</dd>
+                </dl>
+                <p>If the first argument is not one of these commands, then <strong>l</strong> is assumed as a default.</p>
+                
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+                
+                <h3>Options</h3>
+                <p>If zip64 is called with the special option <strong>-h</strong>
+                  a short explanation of the usage is displayed and all other arguments are ignored.</p>
+                <p>Otherwise the following options can be used:</p>
+                <table>
+                  <thead>
+	                  <tr><th>option</th><th>cmd</th><th>meaning</th></tr>
+                  <thead>
+                  <tbody>
+                    <tr><td><strong>-d:&lt;ziproot&gt;</strong></td><td>n, x</td><td>external directory relative to which the files will be injected or extracted<br/>default: current folder</td></tr>
+                    <tr><td><strong>-c</strong></td><td>n</td><td>if present, content will be compressed<br/>default: uncompressed storage (ZIP64 file is just used as a container)</td></tr>
+                    <tr><td><strong>-r</strong></td><td>n, x</td><td>if present, the target files will be replaced/overwritten without warning<br/>default: processing skips existing file entries and lists them on <em>stderr</em>.</td></tr>
+                    <tr><td><strong>-q</strong></td><td>n, x</td><td>quiet, do not display output on <em>stdout</em><br/>default: listing on <em>stdout</em></td></tr>
+                    <tr><td><strong>-z:&lt;comment&gt;</strong></td><td>n</td><td>adds a comment to the ZIP file</td></tr>
+                  </tbody>
+                </table>
+                
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+                
+                <h3>zipfile</h3>
+                <p>Archive file in ZIP format. On input this can be either 
+                  in ZIP32 or in ZIP64 format. The <em>zip64</em> utility 
+                  will only write archives in the ZIP64 format, even if 
+                  the content could be stored in ZIP32 format.</p>
+                  
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+                
+                <h3>files ...</h3>
+                <p>One or more names of files or @ followed by the name 
+                  of a plain text file containing the names of files to 
+                  be injected or extracted. (The text file will be read 
+                  with the JAVA default character set which can be changed 
+                  by specifying the JVM parameter file.encoding on the 
+                  command line.)</p>
+                <p>Each filename (on the command line or in the file list) 
+                  can contain the wildcard characters ?, * or **. The ? 
+                  indicates a single character at this position in the name. 
+                  The * indicates any number of characters in a file or 
+                  folder name. It occurs at most once in a file or folder 
+                  name. ** indicates any number of characters including 
+                  the folder separator. It occurs at most once in the full 
+                  file name.</p>
+                <p>If the <em>file...</em> argument is missing, ** is 
+                  assumed as a default.</p>
+                <p>N.B.: Unfortunately the command line is parsed in a 
+                  half-hearted way by the shell or by JAVA. Therefore you 
+                  cannot enter a file template starting with „**“. You 
+                  have to avoid the situation by starting the file name 
+                  template with another character or use the file name list.</p>
+                <p>Also you need to be careful not to start a file name 
+                  with „/“ on the Windows platform. On this platform „/“ 
+                  is treated as a variant of „-“ and introduces 
+                  command-line options.</p>
+                  
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+                
+                <h2>Examples</h2>
+                
+                <pre>java -jar "C:\Programme\Enter AG\zip64-1.0\lib\zip64.jar" n "-d=C:\Dokumente und Einstellungen\Hartwig\Eigene Dateien\SourceFolder" "C:\Dokumente und Einstellungen\Hartwig\Eigene Dateien\Test.zip"</pre>
+                <p>recursively packs all files in <em>SourceFolder</em> into 
+                  <em>test.zip</em> retaining the path name relative to 
+                  the source folder in the ZIP file. If <em>test.zip</em>
+                  already existed, the new content is added, unless its 
+                  name collides with an existing file entry.</p>
+                
+                <pre>java -jar "C:\Programme\Enter AG\zip64-1.0\lib\zip64.jar" x "-d=C:\Dokumente und Einstellungen\Hartwig\Eigene Dateien\TargetFolder" "C:\Dokumente und Einstellungen\Hartwig\Eigene Dateien\Test.zip"</pre>
+                <p>recursively extracts all content of <em>test.zip</em> 
+                  into the <em>TargetFolder</em>. Existing files in the 
+                  target folder are not overwritten.</p>
+                  
+                <p>If the two examples are executed one after the other 
+                  where initially the file <em>test.zip</em> did not exist 
+                  and the target folder was empty, then the target folder 
+                  ends up with the same content as the source folder.</p>
+                
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+                
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="container-fluid">
+          <hr class="footer-line">
+          <img src="../assets/img/logo-CH.svg" onerror="this.onerror=null; this.src='../assets/img/logo-CH.png'" />
+          <h1 class="hidden-xs">Swiss Federal Archives</h1>
+          <p class=pull-right><a href="../../../LICENSE.txt">License</a></p>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- ===================================================================
+Users' Manual of Zip64File: Introduction
+Application: SIARD Suite 2.1
+Platform   : HTML5
+========================================================================
+Copyright  : Enter AG, Joweid Zentrum 1, 8036 Rüti ZH, Switzerland, 2018
+==================================================================== -->
+  <head>
+    <title>Zip64File - Developers' Manual - Introduction</title>
+    <!-- character set -->
+    <meta charset="utf-8" />
+    <!-- Icon -->
+    <link rel="icon" type="image/gif" href="../assets/img/icon.gif" />
+    <!-- Global style sheet -->
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/print.css">
+    <link rel="stylesheet" href="../assets/css/siard.css" />
+  </head>
+  <body>
+
+    <div class="container container-main">
+      <header>
+        <div class="clearfix">
+          <div class="table-row">
+            <span class="header-logo">
+              <img src="../assets/img/swiss.svg" onerror="this.onerror=null; this.src='../assets/img/swiss.png'" alt="Confederatio Helvetica" />
+            </span>
+            <h1 class="header-title">Zip64File - Developers' Manual</h1>
+          </div>
+        </div>
+      </header>
+      
+      <div class="nav-main navbar" id="main-navigation"></div>
+    
+      <div class="container-fluid hidden-xs">
+        <div class="row">
+          <div class="col-sm-12">
+            <h2 id="br1" class="hidden">Breadcrumbs</h2>
+            <ol class="breadcrumb" role="navigation" aria-labelledby="br1">
+              <li><a href="./index.html">Zip64File - Developers' Manual</a><span class="icon icon--greater"></span></li>
+              <li class="active" aria-selected="true">Introduction</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-12 main-column" id="content" role="main">
+            <div class="contentHead">
+              <div class="mod mod-contentpage">
+                <h1>Zip64File - Developers' Manual - Introduction</h1>
+              </div>
+            </div>  
+            <div class="mod mod-text">
+              <section class="clearfix">
+                <h2>Introduction</h2>
+                <p>The original code of the ZIP64 libraries was developed 
+                  in 2007 as part of the <a href="https://www.bar.admin.ch/bar/de/home/archivierung/tools---hilfsmittel/siard-suite.html" target="_blank">SIARD Suite</a> 
+                  of the Swiss Federal Archives. For archiving large 
+                  databases a standardized platform-independent container 
+                  format was needed that could accommodate files larger 
+                  than 4GB and many more files than the 65'536 that could 
+                  be accommodated by the traditional tools.</p>
+                <p>Similar to the approach chosen by the developers of 
+                  OpenOffice and Microsoft Office, the Swiss Federal Archives 
+                  decided on a ZIP file containing XML files holding 
+                  metadata describing the database structure, XML files 
+                  with the primary table data, and binary files for the database 
+                  LOBS (large objects) as their basic format for long-term 
+                  preservation of relational databases.</p>
+                <p>Our investigation showed, that every implementation of 
+                  ZIP (including Windows zipped folders and <em>java.util.zip</em>)
+                  with the exception of <em>PkWare</em>, the inventor and 
+                  leader of the field, only implemented the version 2.x 
+                  of the format, which since more than ten years has been 
+                  enhanced by <em>PkWare</em> to accommodate large files. 
+                  We call this enhanced format (ZIP file specification 
+                  4.5 or higher) ZIP64 for short, because it uses 64 bit 
+                  long integers for file sizes and such, distinguishing 
+                  it from the old ZIP32 format supported by everybody else.</p>
+                
+                <p class="pull-right">
+                  <small>
+                    <a href="#" class="icon icon--before icon--power hidden-print">Top of page</a>
+                  </small>
+                </p>
+                
+                <h3>Intellectual Property Rights</h3>
+                <p><em>Zip64File</em> is a development of Enter AG.
+                  It is published under the <a href="http://opensource.org/licenses/CDDL-1.0" target="_blank">CDDL-1.0 license</a>
+                  (in the <em>Zip64File</em> distribution as <em>doc/licenses/CDDL-1.0.txt</em>).</p>
+                <p><em>Zip64File</em> relies on the following components of other manufacturers:</p>
+                <dl>
+                  <dt>JAVA SE 1.7 or higher</dt>
+                  <dd>from Oracle <a href="http://www.oracle.com/technetwork/java/javase/downloads/" target="_blank">http://www.oracle.com/technetwork/java/javase/downloads/</a><br/>
+                    License: <a href="http://www.oracle.com/technetwork/java/javase/terms/license/index.html" target="_blank">Oracle Binary Code License Agreement for the Java SE Platform Products and JavaFX</a>
+                    in the Zip64File distribution as <em>doc/licenses/java-license.txt</em>
+                  </dd>
+                  <dt>Enter Utilities</dt>
+                  <dd> from Enter AG<br/>
+                    License: <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank">GNU General Public License 3 (GPLv3)</a> 
+                    in the Zip64File distribution as <em>doc/licenses/gpl-3.0.txt</em>
+                  </dd>
+                </dl>
+                <p>A copy of all licenses can be found in the <em>doc/licenses</em> 
+                  folder of the distribution ZIP file. A copy of all third party 
+                  binaries used by <em>SIARD Suite</em> can be found in the <em>lib</em>
+                  folder of the distribution.</p>
+
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+                
+                <h3>Requirements</h3>
+                <p>The following requirements guided the development:</p>
+                <ul>
+                  <li>SIARD files would become very large. The user „opening“ 
+                    such a Tera-byte file should not experience long waiting times.</li>
+                  <li>The ZIP64 format implemented would not have to support 
+                    all features of the <a href="https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT" target="_blank">current ZIP file standard</a>. 
+                    It did not need to support splitting, spanning or 
+                    encryption. It did not need to support exotic mainframe 
+                    file systems, support of Windows and LINUX/UNIX platforms 
+                    would be sufficient. It did not need to support many 
+                    different compression methods as it would mainly be 
+                    used as a container. (Compression being an issue that 
+                    should be delegated to the device drivers of the storage 
+                    media rather than handled at application level.) It 
+                    should, however, within its limitations be interoperable 
+                    with <em>PKZIP</em> from <em>PkWare</em>, the only 
+                    other software supporting the ZIP64 format.</li>
+                </ul>
+                <p>The first of these requirements was met by relying on 
+                  random access files. As opposed to most other basic JAVA 
+                  file I/O utilities including <em>java.util.zip</em> the 
+                  <em>Zip64File</em> library is not based on streams but 
+                  on the JAVA class <em>RandomAccessFile</em> – a reason 
+                  to call it <em>Zip64File</em> rather than just <em>Zip64</em>.
+                  In the SIARD application we would have to write this file 
+                  once. But every later access would only open the ZIP 
+                  directory located at the very end of the file and the 
+                  XML file containing the metadata. By making sure that 
+                  every freshly written file was written at the very end 
+                  just before the central ZIP directory, reading and writing 
+                  of metadata would be fast. Read-access to any data that the 
+                  user desired, would be fast too, because a random access 
+                  seek would access them in seconds, even in very large files.</p>
+                <p>The second requirement was met by sticking meticulously 
+                  to the ZIP64 file format description of <em>PkWare</em> 
+                  and by continually testing the interoperability with <em>PKZIP</em>.</p>
+                <h3>Public Domain Development</h3>
+                <p>For a while <em>Zip64File</em> was offered as downloadable 
+                  source on <a href="https://www.enterag.ch" target="_blank">Enter AG's web site</a>.
+                  Then it was found that many users of <em>SIARD Suite</em>
+                  had a need for a public domain utility helping them to 
+                  UNZIP their SIARD files for inspection. Their objection 
+                  to using <em>PKZIP</em> was less due to tight-fistedness 
+                  or a lack of recognition for the merits of <em>PkWare</em> in 
+                  the development of the ZIP format but a fear of lock-in 
+                  if they were dependent on a single supplier.</p>
+                  <p>Therefore the command-line utility <em>zip64</em> was 
+                  developed which permits to ZIP and UNZIP files in the ZIP64 
+                  format – subjected to the restrictions mentioned above: 
+                  No spanning or splitting, no encryption, no proprietary, 
+                  fancy compression formats.</p>
+                <p>In the process of this development the code of both the 
+                  library and API Zip64File as well as for the command-line 
+                  utility zip64 was moved to <a href="https://sourceforge.net/projects/zip64file/" target="_blank">SourceForge</a>.
+                  When the Swiss Federal Archives decided to publish the
+                  source code of <em>SIARD Suite 2.1</em> on <em>GitHub</em>,
+                  the project <em>Zip64File</em> was slightly refactored
+                  and moved there too.</p> 
+                
+                <p>This document is the developers' manual of the project <em>Zip64File</em>.</p>
+                
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+
+                <h3>Addendum 2011/2018</h3>
+                <p>In JAVA 1.7 the built-in JAVA ZIP utilities (<em>java.util.zip</em>) 
+                finally do support ZIP contents larger than 4 GB. However, 
+                they do not permit manipulating large ZIP files in a convenient 
+                way (random access file). This has the advantage that the 
+                classes in <em>java.util.zip</em> can be applied to streams. 
+                But it has the disadvantage that a small update may force 
+                the writing of many gigabytes. Therefore this library is 
+                still supported as an alternative to it.</p>
+                
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+                
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="container-fluid">
+          <hr class="footer-line">
+          <img src="../assets/img/logo-CH.svg" onerror="this.onerror=null; this.src='../assets/img/logo-CH.png'" />
+          <h1 class="hidden-xs">Swiss Federal Archives</h1>
+          <p class=pull-right><a href="../../../LICENSE.txt">License</a></p>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

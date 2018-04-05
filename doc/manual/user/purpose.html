@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- ===================================================================
+Users' Manual of Zip64File: Purpose
+Application: SIARD Suite 2.1
+Platform   : HTML5
+========================================================================
+Copyright  : Enter AG, Joweid Zentrum 1, 8036 Rüti ZH, Switzerland, 2018
+==================================================================== -->
+  <head>
+    <title>Zip64File - Users' Manual - Purpose</title>
+    <!-- character set -->
+    <meta charset="utf-8" />
+    <!-- Icon -->
+    <link rel="icon" type="image/gif" href="../assets/img/icon.gif" />
+    <!-- Global style sheet -->
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/print.css">
+    <link rel="stylesheet" href="../assets/css/siard.css" />
+  </head>
+  <body>
+
+    <div class="container container-main">
+      <header>
+        <div class="clearfix">
+          <div class="table-row">
+            <span class="header-logo">
+              <img src="../assets/img/swiss.svg" onerror="this.onerror=null; this.src='../assets/img/swiss.png'" alt="Confederatio Helvetica" />
+            </span>
+            <h1 class="header-title">Zip64File - Users' Manual</h1>
+          </div>
+        </div>
+      </header>
+      
+      <div class="nav-main navbar" id="main-navigation"></div>
+    
+      <div class="container-fluid hidden-xs">
+        <div class="row">
+          <div class="col-sm-12">
+            <h2 id="br1" class="hidden">Breadcrumbs</h2>
+            <ol class="breadcrumb" role="navigation" aria-labelledby="br1">
+              <li><a href="./index.html">Zip64File - Users' Manual</a><span class="icon icon--greater"></span></li>
+              <li class="active" aria-selected="true">Purpose</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-12 main-column" id="content" role="main">
+            <div class="contentHead">
+              <div class="mod mod-contentpage">
+                <h1>Zip64File - Users' Manual - Purpose</h1>
+              </div>
+            </div>  
+            <div class="mod mod-text">
+              <section class="clearfix">
+                <h2>Purpose of the Project</h2>
+                
+                <p><em>Zip64File</em> was developed as part of the SIARD project. 
+                  It is used by the <em>SiardApi</em> implementation of the SIARD project in 
+                  order to read and write SIARD files adhering to the standardized 
+                  SIARD Format 2.1.</p>
+
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+
+                <h3>ZIP64</h3>
+                <p>The ZIP format was created by created in 1989 by Phil Katz 
+                  for <a href="https://pkware.com/" target="_blank">PKZIP</a>. 
+                  It is widely used for compression and as a container of 
+                  files and folders (e.g. Windows ZIP folders, JAVA JAR 
+                  files, OpenOffice ODT files, Microsoft Office DOCX files, ...).</p>
+                <p>The liberal treatment of the ZIP format by its creator 
+                  has motivated many programmers to develop tools on many 
+                  platforms which can read and write ZIP files.</p>
+                <p>Lately the limitations of the „old“ ZIP file format 
+                  specification (maximum file size 4GB, maximum number of 
+                  files 65k) were felt to be too constrictive for today's 
+                  needs. Therefore PKWARE published a <a href="https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT" target="_blank">new version of the 
+                  file format description</a> which permits 64 bit file sizes 
+                  and 32 bit file counts.</p>
+                <p>At this point in time most of the third-party utilities 
+                  and libraries do not support this extension to 64 bits yet. 
+                  Therefore we have developed a JAVA library as well as a 
+                  command-line utility which permits reading and writing 
+                  of files according to the new ZIP64 standard.</p>
+                <p>Both, the library and the command-line utility implement 
+                  a subset of the ZIP64 standard. At the moment neither 
+                  splitting and spanning nor encryption are supported. 
+                  Both, the library and the utility can read files 
+                  according to the ZIP32 or ZIP64 standard, but they will 
+                  only write files according to the ZIP64 standard – even 
+                  when the content could be accommodated within the 
+                  limitations of the ZIP32 standard.</p>
+                <p>The use of the API in <em>zip64.jar</em> is documented 
+                  in its technical documentation. The usage of the command-line
+                  tool is documented in this manual.</p>
+
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+
+                <h3>Addendum 2011/2018</h3>
+                <p>In JAVA 1.7 the built-in JAVA ZIP utilities (<em>java.util.zip</em>) 
+                finally do support ZIP contents larger than 4 GB. However, 
+                they do not permit manipulating large ZIP files in a convenient 
+                way (random access file). This has the advantage that the 
+                classes in <em>java.util.zip</em> can be applied to streams. 
+                But it has the disadvantage that a small update may force 
+                the writing of many gigabytes. Therefore this library is 
+                still supported as an alternative to it.</p>
+                
+                <p><em>Zip64File</em> can be used for 
+                  many other purposes without any relationship with the
+                  SIARD project. Therefore it is published as a separate
+                  stand-alone project.</p> 
+
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="container-fluid">
+          <hr class="footer-line">
+          <img src="../assets/img/logo-CH.svg" onerror="this.onerror=null; this.src='../assets/img/logo-CH.png'" />
+          <h1 class="hidden-xs">Swiss Federal Archives</h1>
+          <p class=pull-right><a href="../../../LICENSE.txt" target="_blank">License</a></p>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
