@@ -554,7 +554,7 @@ public class Zip64File
   	m_df.seek(m_df.length());
   	/* search for signature of the end of central directory record (comment can be of variable length)*/
   	long lEndCenDirRecord = m_df.lastIndexOf(BU.fromInt(0x06054b50));
-  	while ((m_sComment == null) && (lEndCenDirRecord >= 0))
+  	if ((m_sComment == null) && (lEndCenDirRecord >= 0))
   	{
   		/* get length of comment */
   		m_df.seek(lEndCenDirRecord+20);
