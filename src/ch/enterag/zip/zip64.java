@@ -30,15 +30,15 @@ public class zip64
   /** program name */
   private static final String PROGRAM = "zip64";
   /** program version (to be updated synchronously with version in build.xml) */
-  private static final String VERSION = "1.02";
+  private static final String VERSION = "2.02";
   /** banner briefly states functionality */
   private static final String BANNER = "handles ZIP64 archives";
   /** copyright notice */
   private static final String COPYRIGHT = "Copyright (c) 2010, Hartwig Thomas, Enter AG, Zurich, Switzerland";
   /** GPL reference */
-  private static final String GPL = "This program comes with ABSOLUTELY NO WARRANTY.\n"+
-                                    "This is free software, and you are welcome to redistribute it under certain conditions.\n"+
-                                    "See gpl-2.0.txt for details.\n";
+  private static final String CDDL = "This program comes with ABSOLUTELY NO WARRANTY.\n"+
+                                    "This is open source software, and you are welcome to redistribute it.\n"+
+                                    "See https://opensource.org/licenses/CDDL-1.0 for details.\n";
   /* return codes */
   /** return code for success */
   private static final int RETURN_OK = 0;
@@ -729,7 +729,7 @@ public class zip64
         m_bQuiet = false;
       displayMessage(PROGRAM+" "+VERSION+" - "+BANNER);
       displayMessage(COPYRIGHT);
-      displayMessage(GPL);
+      displayMessage(CDDL);
       if ((m_fileZipArchive != null) && (m_listFiles.size() > 0))
       {
         if (COMMAND_LIST.equals(m_sCommand))
