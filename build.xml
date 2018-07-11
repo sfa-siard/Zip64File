@@ -273,6 +273,7 @@ Created    : 16.04.2010, Hartwig Thomas
     <javadoc 
       access="public" 
       author="true" 
+    	additionalparam="&quot;-html5&quot;"
       classpath="${cpenterutils}"
       destdir="${dirjavadoc}" 
       doctitle="ZIP64" 
