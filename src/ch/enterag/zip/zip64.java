@@ -30,7 +30,7 @@ public class zip64
   /** program name */
   private static final String PROGRAM = "zip64";
   /** program version (to be updated synchronously with version in build.xml) */
-  private static final String VERSION = "2.02";
+  private static final String VERSION = "2.1";
   /** banner briefly states functionality */
   private static final String BANNER = "handles ZIP64 archives";
   /** copyright notice */
