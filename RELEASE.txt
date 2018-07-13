@@ -4,6 +4,7 @@ Release Notes for Zip64File 2.1
 2.1.0
 Release for JAVA 10
 GPL 2 license removed, CDDL 1.0 license added
+Scripts for command line added
 
 2.0.60 
 .gitattributes added
