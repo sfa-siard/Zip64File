@@ -1,6 +1,5 @@
 /*== zip64.java ========================================================
 zip64 implements the command-line zip64 utility.
-Version     : $Id: zip64.java 42 2011-11-14 15:12:37Z hartwigthomas $
 Application : ZIP Utilities
 Description : zip64 implements the command-line zip64 utility.
               It handles large ZIP files but does not (yet) support

@@ -57,17 +57,20 @@ Copyright  : Enter AG, Joweid Zentrum 1, 8036 Rüti ZH, Switzerland, 2018
             <div class="mod mod-text">
               <section class="clearfix">
                 <h2>Usage</h2>
-                <p>It is recommended to call the ZIP64 binary using its 
-                  full path name. Knowledgeable users may add that path 
-                  name to their PATH environment variable. It is then 
-                  their responsibility to resolve possible collisions 
-                  with other binaries of the same name.</p>
-                <p>The zip64 command-line is called like this:</p>
-                <pre>java -jar &lt;zip64path&gt;/lib/zip64.jar &lt;command&gt; options &lt;zipfile&gt; files...</pre>
-                
-                <p class="pull-right">
-                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
-                </p>
+                <p>Zip64File implements a command-line <em>zip64</em> as well as
+                  an API for programmers. The use of the API is documented
+                  in the developer's manual and in the javadoc documentation.
+                  Here we describe the use of the command-line <em>zip64</em>.
+                <p><em>zip64</em> is started by running <em>zip64.cmd</em> (for Windows)
+                  or <em>zip64.sh</em> (for LINUX) or explicitly starting it
+                  using the appropriate JAVA executable.</p>
+                <pre>zip64.cmd &lt;arguments&gt;,
+zip64.sh &lt;arguments&gt;, or
+java -jar &lt;zip64path&gt;/lib/zip64.jar &lt;arguments&gt;</pre>
+                <p>where <em>&lt;zip64path&gt;</em> refers to the installation folder 
+                  of <em>Zip64File</em> and <em>&lt;arguments&gt;</em> refers to 
+                  the following arguments that can be specified on the command-line:</p>
+                <pre>&lt;command&gt; options &lt;zipfile&gt; files...</pre>
                 
                 <h3>Command</h3>
                 <p>The command defines the basic operation executed by <em>zip64</em>.
@@ -84,7 +87,7 @@ Copyright  : Enter AG, Joweid Zentrum 1, 8036 Rüti ZH, Switzerland, 2018
                 </p>
                 
                 <h3>Options</h3>
-                <p>If zip64 is called with the special option <strong>-h</strong>
+                <p>If <em>zip64</em> is called with the special option <strong>-h</strong>
                   a short explanation of the usage is displayed and all other arguments are ignored.</p>
                 <p>Otherwise the following options can be used:</p>
                 <table>
