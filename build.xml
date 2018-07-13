@@ -18,6 +18,7 @@ Created    : 16.04.2010, Hartwig Thomas
   <property name="dirsrc" value="src"/>
   <property name="dirtest" value="test/"/>
   <property name="dirlib" value="lib"/>
+  <property name="dirbin" value="bin"/>
   <property name="dirdoc" value="doc"/>
   <property name="diretc" value="etc"/>
   <property name="dirvar" value="var"/>
