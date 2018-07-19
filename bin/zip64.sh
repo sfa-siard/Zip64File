@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #=======================================================================
 # zip64 executes ch.enterag.zip.zip64 in lib/zip64.jar. 
 # Application: Siard2
@@ -18,6 +18,28 @@ reljar=lib/zip64.jar
 rellogprop=etc/logging.properties
 # class with main() to be run
 class=ch.enterag.zip.zip64
+
+#-----------------------------------------------------------------------
+# javafind searches for java executable. If one is found, 1 is returned
+# and the full path is echoed to stdout. Otherwise 0 is returned.
+#-----------------------------------------------------------------------
+javafind()
+{
+  found=0
+  javapath=$(type -p java)
+  if $javapath; 
+  then
+    echo $javapath
+    found=1
+  elif [[ -n "$JAVA_HOME" ]] && [[ -x "$JAVA_HOME/bin/java" ]];  then
+    $javapath="$JAVA_HOME/bin/java"
+    echo $javapath     
+    found=1
+  else
+    echo "no java"
+  fi  
+  return $found 
+} # javafind
 
 #-----------------------------------------------------------------------
 # javackeck returns 1, if $java exists and has major version 
@@ -62,9 +84,8 @@ help()
   echo "  <args>      see documentation of SiardFromDb"
   echo ""
   echo "JavaHome:"
-  echo "  In order to find a suitable java executable, \"java\" is first"
-  echo "  tried, then all PATH folders, then JAVA_HOME and finally the"
-  echo "  whole file system is searched."
+  echo "  In order to find a suitable java executable, the PATH is first"
+  echo " searched for \"java\", then JAVA_HOME."
   echo ""
   echo "JavaOpts:"
   echo "  The environment variable JAVA_OPTS is used as a"
@@ -81,8 +102,8 @@ help()
 #-----------------------------------------------------------------------
 error()
 {
-  echo 'No valid java executable could be found!                            '
-  echo 'Install the JAVA JRE or indicate correct location using JAVA_HOME!  '
+  echo "No valid java executable with version greater than $minjavaversion could be found!"
+  echo "Install the JAVA JRE or indicate correct location using JAVA_HOME!"
   return 8
 } # error
 
@@ -110,69 +131,24 @@ execute()
 if [ "$1" != "-h" ];
 then
   args="$@"
-  # check https://stackoverflow.com/questions/7334754/correct-way-to-check-java-version-from-bash-script
-  java=/usr/bin/java
-  javacheck
+  java=$(javafind)
   ok=$?
-
-  # try PATH
-  if [ $ok -eq 0 ];
+  if [  $ok -eq 0 ];
   then
-    echo "trying PATH ..."
-    ifssaved="$IFS"
-    IFS=:
-    for dir in $PATH
-    do
-      if [ $ok -eq 0 ];
-      then
-        java="$dir/java"
-        javacheck
-        ok=$?
-      fi
-    done
-    IFS="$ifssaved"
-  fi
-  
-  # then try JAVA_HOME
-  if [ $ok -eq 0 ];
-  then
-    echo "trying JAVA_HOME ..."  
-    java="$JAVA_HOME/bin/java"
     javacheck
     ok=$?
-  fi
-  
-  # finally try file system
-  if [ $ok -eq 0 ];
-  then
-    echo "searching in file system ..."
-    ifssaved="$IFS"
-    IFS="
-"
-    for f in `find / -path */bin/java -print 2>/dev/null`
-    do
-      if [ $ok -eq 0 ];
-      then
-        java="$f"
-        javacheck
-        ok=$?
-      fi
-    done
-    IFS="$ifssaved"    
-  fi
-  
-  # if a suitable java executable was found then execute it
-  if [ $ok -ne 0 ];
-  then
-    execute
+    # if a suitable java executable was found then execute it
+    if [ $ok -ne 0 ];
+    then
+      execute
+    else
+      error
+    fi
   else
     error
-  fi
-  rc=$?
-  
+  fi  
 else
   help
-  rc=$?
 fi
-
+rc=$?
 exit $rc
