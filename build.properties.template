@@ -21,8 +21,6 @@ dirdeploy=/Users/Hartwig/test
 #dirdeploy=D:/Temp
 
 #-----------------------------------------------------------------------
-# The bootstrap class (run-time jar) for compiling code compatible 
-# with JSE 1.8.
 # The bootstrap class (run-time jar) for compiling code compatible with JSE 1.8.
 #java8rtjar=C:/Program Files/Java/jdk1.8.0_144/jre/lib/rt.jar
 java8rtjar=/usr/lib/jvm/java-8-oracle/jre/lib/rt.jar
