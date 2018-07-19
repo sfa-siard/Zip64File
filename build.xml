@@ -344,6 +344,7 @@ Created    : 16.04.2010, Hartwig Thomas
     <echo message="${ant.project.name}: deploy"/>
     <delete dir="${dirdeploy}/${ant.project.name}"/>
     <unzip dest="${dirdeploy}" src="${dirdist}/${ant.project.name}-${version}.${revision}.zip" />
+  	<chmod dir="${dirdeploy}" perm="ugo+rx" includes="**/*.sh"/>
   </target>
   
 </project>
