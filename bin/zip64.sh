@@ -100,7 +100,7 @@ help()
 #-----------------------------------------------------------------------
 error()
 {
-  echo "No valid java executable with version greater than $minjavaversion could be found!"
+  echo "No valid java executable with version equal or greater than $minjavaversion could be found!"
   echo "Install the JAVA JRE or indicate correct location using JAVA_HOME!"
   return 8
 } # error
