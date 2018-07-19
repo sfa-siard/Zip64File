@@ -21,22 +21,19 @@ class=ch.enterag.zip.zip64
 
 #-----------------------------------------------------------------------
 # javafind searches for java executable. If one is found, 1 is returned
-# and the full path is echoed to stdout. Otherwise 0 is returned.
+# and the variable java is set to the full path. Otherwise 0 is returned.
 #-----------------------------------------------------------------------
 javafind()
 {
   found=0
-  javapath=$(type -p java)
-  if $javapath; 
+  java=$(type -p java)
+  if [ -n "$java" ] 
   then
-    echo $javapath
     found=1
-  elif [[ -n "$JAVA_HOME" ]] && [[ -x "$JAVA_HOME/bin/java" ]];  then
-    $javapath="$JAVA_HOME/bin/java"
-    echo $javapath     
+  elif [ -n "$JAVA_HOME" ] && [ -x "$JAVA_HOME/bin/java" ]
+  then
+    $java="$JAVA_HOME/bin/java"
     found=1
-  else
-    echo "no java"
   fi  
   return $found 
 } # javafind
@@ -52,17 +49,18 @@ javacheck()
   # drop "1." from minjavaversion
   minjavaversion=${minjavaversion#1.}
   # execute java -version with small memory requirement
-  # output must start with something like 'openjdk version "1.8.0_144"' or '9-Debian' or 'java version "10.0.1"'
-  # extract everything between the two quotes
-  version=`$java -Xms32M -Xmx32M -version 2>&1` | sed -e 's/.*version "\(.*\)"\(.*\)/\1/; 1q')
-  if [ $? = 0 ]
+  version=`$java -Xms32M -Xmx32M -version 2>&1`
+  # output must start with something like 'openjdk version "1.8.0_144"' or 'java version "10.0.1"'
+  reQuoted='version "([^"]+)"'
+  if [[ $version =~ $reQuoted ]]
   then
+    version=${BASH_REMATCH[1]}
     # drop "1." from version
     version=${version#1.}
-    # drop everything after the first "."
+    # drop everything after the first "." (for numerical comparison)
     version=${version%%.*}
     # numeric comparison
-    if [ "$version" \> "$minjavaversion" ];
+    if [ $version -ge $minjavaversion ]
     then
       ok=1
     fi  
@@ -113,9 +111,9 @@ error()
 execute()
 {
   execdir="$0"
-  execdir=${execdir%/siardfromdb.sh}
+  execdir=${execdir%/*}
   opts="-Xmx1024m -Djava.util.logging.config.file=\"$execdir/$rellogprop\" $JAVA_OPTS"
-  echo "$java" $opts -cp "$execdir/$reljar"  "$class" "$args"
+  #echo "$java" $opts -cp "$execdir/$reljar"  "$class" "$args"
   if [ ${#args} -eq 0 ];
   then
     "$java" $opts -cp "$execdir/$reljar"  "$class"
@@ -131,9 +129,9 @@ execute()
 if [ "$1" != "-h" ];
 then
   args="$@"
-  java=$(javafind)
+  javafind
   ok=$?
-  if [  $ok -eq 0 ];
+  if [ $ok -ne 0 ];
   then
     javacheck
     ok=$?
