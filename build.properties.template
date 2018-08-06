@@ -37,3 +37,4 @@ git=C:/Program Files/Git/bin/git.exe
 # value of additionalparam for javadoc (must be empty for JDK 1.8 and
 # -html5 for later versions.
 javadocadd=-html5
+#javadocadd=-html5
