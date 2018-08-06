@@ -37,4 +37,5 @@ git=/usr/bin/git
 #------------------------------------------------------------------------
 # value of additionalparam for javadoc (must be empty for JDK 1.8 and
 # &quot;-html5&quot; for later versions.
-javadocadd=
+javadocadd=&quot;-html5&quot;
+#javadocadd=
