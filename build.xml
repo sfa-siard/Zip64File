@@ -88,6 +88,7 @@ Created    : 16.04.2010, Hartwig Thomas
             <isset property="version"/>
             <isset property="revold"/>
             <isset property="java8rtjar"/>
+          	<isset property="javadocadd"/>
           </and>
         </not>
       </condition>
@@ -274,7 +275,7 @@ Created    : 16.04.2010, Hartwig Thomas
     <javadoc 
       access="public" 
       author="true" 
-    	additionalparam=""
+    	additionalparam="${javadocadd}"
       classpath="${cpenterutils}"
       destdir="${dirjavadoc}" 
       doctitle="ZIP64" 
