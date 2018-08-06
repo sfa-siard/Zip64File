@@ -17,25 +17,23 @@
 #-----------------------------------------------------------------------
 # The deployment folder to which the binaries are to be unzipped.
 #dirdeploy=/Users/Hartwig/test
-dirdeploy=/home/hartwig/test
-#dirdeploy=D:/Temp
+#dirdeploy=/home/hartwig/test
+dirdeploy=D:/Temp
 
 #-----------------------------------------------------------------------
-# The bootstrap class (run-time jar) for compiling code compatible with JSE 1.8.
-#java8rtjar=C:/Program Files/Java/jdk1.8.0_144/jre/lib/rt.jar
-java8rtjar=/usr/lib/jvm/java-8-oracle/jre/lib/rt.jar
-#java8rtjar=/Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home/jre/lib/rt.jar
+# The bootstrap class (run-time jar) for compiling code compatible 
+# with JSE 1.8.
+java8rtjar=C:/Program Files/Java/jdk1.8.0_144/jre/lib/rt.jar
 
 #-----------------------------------------------------------------------
 # The following property definition signals, that git can be 
 # called with "git commit", "git pull" and "git push" from the project's
 # root folder. If that is not the case, it must be commented out.
 # (Setting it to "false" is not sufficient!)
-git=/usr/bin/git
-#git=C:/Program Files/Git/bin/git.exe
+#git=/usr/bin/git
+git=C:/Program Files/Git/bin/git.exe
 
 #------------------------------------------------------------------------
 # value of additionalparam for javadoc (must be empty for JDK 1.8 and
-# &quot;-html5&quot; for later versions.
-javadocadd=&quot;-html5&quot;
-#javadocadd=
+# -html5 for later versions.
+javadocadd=-html5
