@@ -961,6 +961,7 @@ public class Zip64FileTester extends TestCase
 		{
 			Zip64File zf = new Zip64File(m_sTestZipFile);
 			zf.delete("many/small12345.txt");
+			FileEntry nonExistentDel = zf.delete("non-existent");
 			zf.close();
 			if (!extractFile("many/small12344.txt"))
 				fail("many/small12344.txt could not be extracted!");
@@ -972,6 +973,8 @@ public class Zip64FileTester extends TestCase
 				fail("many/small12346.txt could not be extracted!");
 			if (!equalTest(fileSmall12346,fileSmall12346Original))
 				fail("extracted compressed small12346 file is not equal to its original!");
+			if (nonExistentDel != null)
+				fail("deleting a non-existent file should return null!");
 		}
 		catch(FileNotFoundException fnfe) { fail(fnfe.getClass().getName()+": "+fnfe.getMessage());}
 		catch(IOException ie) { fail(ie.getClass().getName()+": "+ie.getMessage());}
