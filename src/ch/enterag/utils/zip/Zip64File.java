@@ -1187,7 +1187,7 @@ public class Zip64File
   /*------------------------------------------------------------------*/
   /** deletes the ZIP file entry.
   @param sEntryName name of file entry to be deleted.
-  @return deleted file entry.
+  @return deleted file entry or null, if the file did not exist
   @throws IOException if an I/O error occurred.
   */
   public FileEntry delete(String sEntryName)
@@ -1225,8 +1225,6 @@ public class Zip64File
 	  	m_listFileEntries.remove(feDelete);
 	  	m_mapFileEntries.remove(feDelete.getName());
   	}
-  	else
-  		throw new ZipException("File "+sEntryName+" cannot be deleted, because it does not exist!");
   	return feDelete;
   } /* delete */
   
