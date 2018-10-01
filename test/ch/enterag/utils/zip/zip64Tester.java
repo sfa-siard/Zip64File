@@ -791,7 +791,7 @@ public class zip64Tester
   } /* testExtractFile */
 
   /**
-   * Test method for extracting single (full) folder.
+   * Test method for extracting single (empty) file.
    */
   @Test
   public void testExtractFolder()

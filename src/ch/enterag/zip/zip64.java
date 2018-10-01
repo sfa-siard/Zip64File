@@ -564,9 +564,9 @@ public class zip64
       if (!fileOutput.exists() || m_bReplace)
       {
         if (fileOutput.exists())
-          displayMessage("extracting " + fileOutput.getAbsolutePath()+" from "+fe.getName());
-        else
           displayMessage("replacing "+fileOutput.getAbsolutePath() +" by "+fe.getName());
+        else
+          displayMessage("extracting " + fileOutput.getAbsolutePath()+" from "+fe.getName());
         /* extract the file entry */
         FileOutputStream fos = new FileOutputStream(fileOutput);
         EntryInputStream eis = zf.openEntryInputStream(fe.getName());
