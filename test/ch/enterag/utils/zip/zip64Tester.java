@@ -32,7 +32,8 @@ import static org.junit.Assert.*;
 import org.junit.*;
 import java.io.*;
 import java.util.*;
-import ch.enterag.utils.io.*;
+
+import ch.enterag.utils.EU;
 import ch.enterag.utils.lang.*;
 import java.text.*;
 
@@ -45,7 +46,7 @@ public class zip64Tester
   /** small file size for test file */
   private final static int iSMALL_SIZE = 12345;
   /** temp location */
-  private final static String sTEMP_LOCATION = SpecialFolder.getUserTemp();
+  private final static String sTEMP_LOCATION = "tmp";
   /** directory for unzipped files */
   private final static String sFOLDER_UNZIP = sTEMP_LOCATION + "/unzip64";
   /** empty folder */
@@ -74,6 +75,10 @@ public class zip64Tester
   private final static DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
   /** size format of zip64 */
   private static final NumberFormat SIZE_FORMAT = new DecimalFormat("#,##0",new DecimalFormatSymbols()); 
+  /** PKZIPC executable */
+  private ZipProperties _zp = ZipProperties.getInstance();
+  private String _sPkZipC = _zp.getPkzipc();
+  private String _sZip30 = _zp.getZip30();
 
   /** delete folder with all test files
    * @param file folder containing test files.
@@ -90,6 +95,8 @@ public class zip64Tester
     }
     if (bDeleted)
       bDeleted = file.delete();
+    try { Thread.sleep(100); }
+    catch(InterruptedException ie) { fail(EU.getExceptionMessage(ie)); }
     return bDeleted; 
   } /* deleteAll */
 
@@ -211,67 +218,61 @@ public class zip64Tester
       fail("directory entries are not both files or both folders!");
     return bEqual; 
   } /* compareAll */
-  
-  @Before
-  public void setUp()
-    throws IOException
+
+  private void zipPkZip(File fileFolderUnzip, File fileFileZip)
   {
-    /* create two folders and two test files in a zip folder using pkzipc */
-    /* in unzip directory ... */
-    File fileFolderUnzip = new File(sFOLDER_UNZIP);
-    fileFolderUnzip.mkdirs();
-    /* ... create empty folder ... */
-    File fileFolderEmpty = new File(sFOLDER_EMPTY);
-    fileFolderEmpty.mkdir();
-    /* ... and full folder ... */
-    File fileFolderFull = new File(sFOLDER_FULL);
-    fileFolderFull.mkdir();
-    /* ... and empty file ... */
-    File fileFileEmpty = new File(sFILE_EMPTY);
-    fileFileEmpty.createNewFile();
-    /* ... and full file */
-    File fileFileFull = new File(sFILE_FULL);
-    FileOutputStream fos = new FileOutputStream(fileFileFull);
-    /* random size 0 .. iSMALL_SIZE-1 */
-    int iLength = (int)Math.ceil(iSMALL_SIZE*Math.random());
-    byte[] buffer = new byte[iLength];
-    /* fill the buffer with random characters */
-    for (int i = 0; i < buffer.length; i++)
-      buffer[i] = (byte)(32+(int)Math.ceil(96*Math.random()));
-    fos.write(buffer);
-    fos.close();
-    /* in zip directory ... */
-    File fileFolderZip = new File(sFOLDER_ZIP);
-    fileFolderZip.mkdirs();
-    File fileFileZip = new File(sFILE_ZIP);
     /* use pkzipc to create zip file in zip directory */
-    /*** this tester should be independent of pkzipc
-    String[] asProg = new String[8];
-    asProg[0] = "pkzipc.exe"; 
-    asProg[1] = "-add=all";
-    asProg[2] = "-attr=all";
-    asProg[3] = "-dir=specify";
-    asProg[4] = "-silent=normal";
-    asProg[5] = "-header="+sZIP_COMMENT;
-    asProg[6] = fileFileZip.getAbsolutePath();
-    asProg[7] = fileFolderUnzip.getAbsolutePath()+"/*";
-    try
-    { 
-      Process procPkZip = Runtime.getRuntime().exec(asProg);
-      InputStream isStdOut = procPkZip.getInputStream();
-      for (int c = isStdOut.read(); c != -1; c = isStdOut.read())
-        System.out.print((char)c);
-      isStdOut.close();
-      int iExitCode = procPkZip.waitFor();
-      if (iExitCode != 0)
-        fail("pkzipc exit code: "+String.valueOf(iExitCode));
-      procPkZip.destroy();
+    String[] asProg = new String[]
+    {
+      _sPkZipC, 
+      "-add=all",
+      "-attr=all",
+      "-dir=specify",
+      "-silent=normal",
+      "-header="+sZIP_COMMENT,
+      fileFileZip.getAbsolutePath(),
+      fileFolderUnzip.getAbsolutePath()+"/*"
+    };
+    Execute exec = Execute.execute(asProg);
+    System.out.println(exec.getStdOut());
+    int iExitCode = exec.getResult();
+    if (iExitCode != 0)
+    {
+      System.err.println(exec.getStdErr());
+      fail(_sPkZipC+" exit code: "+String.valueOf(iExitCode));
     }
-    catch(IOException ie) { fail(ie.getClass().getName()+": "+ie.getMessage());}
-    catch(InterruptedException ie) { fail(ie.getClass().getName()+": "+ie.getMessage()); }
-    ***/
+    try { Thread.sleep(100); }
+    catch(InterruptedException ie) { fail(EU.getExceptionMessage(ie)); }
+  } /* zipPkZip */
+  
+  private void zipInfoZip(File fileFolderUnzip, File fileFileZip)
+  {
+    /* use Info-ZIP zip.exe to create zip file in zip directory */
+    String[] asProg = new String[] 
+    {
+      _sZip30,
+      "-q",
+      "-r",
+      "-z "+sZIP_COMMENT,
+      fileFileZip.getAbsolutePath(),
+      fileFolderUnzip.getAbsolutePath()
+    };
+    Execute exec = Execute.execute(asProg);
+    System.out.println(exec.getStdOut());
+    int iExitCode = exec.getResult();
+    if (iExitCode != 0)
+    {
+      System.err.println(exec.getStdErr());
+      fail(_sZip30+" exit code: "+String.valueOf(iExitCode));
+    }
+    try { Thread.sleep(100); }
+    catch(InterruptedException ie) { fail(EU.getExceptionMessage(ie)); }
+  }
+  
+  private void zip64Zip(File fileFolderUnzip, File fileFileZip)
+  {
     /* use zip64 to create zip file in zip directory */
-    String[] asCommand = new String[] 
+    String[] asProg = new String[] 
     {
       "java",
       "-jar",
@@ -284,20 +285,104 @@ public class zip64Tester
       "-z="+sZIP_COMMENT,
       fileFileZip.getAbsolutePath()
     };
-    Execute exec = Execute.execute(asCommand);
+    Execute exec = Execute.execute(asProg);
+    System.out.println(exec.getStdOut());
     int iExitCode = exec.getResult();
     if (iExitCode != 0)
+    {
+      System.err.println(exec.getStdErr());
       fail("zip64 exit code: "+String.valueOf(iExitCode));
+    }
+    try { Thread.sleep(100); }
+    catch(InterruptedException ie) { fail(EU.getExceptionMessage(ie)); }
+  }
+  
+  @Before
+  public void setUp()
+    throws IOException
+  {
+    /* create two folders and two test files in a zip folder using pkzipc */
+    File fileFolderUnzip = new File(sFOLDER_UNZIP);
+    if (deleteAll(fileFolderUnzip))
+      System.out.println("Deleted files in "+fileFolderUnzip.getAbsolutePath());
+    else
+      System.out.println("Cannot delete files in "+fileFolderUnzip.getAbsolutePath());
+    /* in unzip directory ... */
+    if (fileFolderUnzip.mkdirs())
+    {
+      System.out.println("mkdirs "+fileFolderUnzip+" successful.");
+      /* ... create empty folder ... */
+      File fileFolderEmpty = new File(sFOLDER_EMPTY);
+      if (fileFolderEmpty.mkdir())
+      {
+        System.out.println("mkdir "+fileFolderEmpty+" successful.");
+        /* ... and full folder ... */
+        File fileFolderFull = new File(sFOLDER_FULL);
+        if (fileFolderFull.mkdir())
+        {
+          System.out.println("mkdir "+fileFolderFull+" successful.");
+          /* ... and empty file ... */
+          File fileFileEmpty = new File(sFILE_EMPTY);
+          if (fileFileEmpty.createNewFile())
+          {
+            System.out.println("createNewFile "+fileFileEmpty+" successful.");
+            /* ... and full file */
+            File fileFileFull = new File(sFILE_FULL);
+            FileOutputStream fos = new FileOutputStream(fileFileFull);
+            /* random size 0 .. iSMALL_SIZE-1 */
+            int iLength = (int)Math.ceil(iSMALL_SIZE*Math.random());
+            byte[] buffer = new byte[iLength];
+            /* fill the buffer with random characters */
+            for (int i = 0; i < buffer.length; i++)
+              buffer[i] = (byte)(32+(int)Math.ceil(96*Math.random()));
+            fos.write(buffer);
+            fos.close();
+            System.out.println(String.valueOf(iLength)+" bytes written to "+fileFileFull.getAbsolutePath()+".");
+            /* in zip directory ... */
+            File fileFolderZip = new File(sFOLDER_ZIP);
+            if (deleteAll(fileFolderZip))
+              System.out.println("Deleted files in "+fileFolderZip.getAbsolutePath());
+            else
+              System.out.println("Cannot delete files in "+fileFolderZip.getAbsolutePath());
+            if (fileFolderZip.mkdirs())
+            {
+              File fileFileZip = new File(sFILE_ZIP);
+              if (fileFileZip.exists())
+                fileFileZip.delete();
+              if (_sPkZipC != null)
+                zipPkZip(fileFolderUnzip,fileFileZip);
+              else if (_sZip30 != null)
+                zipInfoZip(fileFolderUnzip,fileFileZip);
+              else
+                zip64Zip(fileFolderUnzip,fileFileZip);
+            }
+            else
+              fail("Cannot make directories for "+fileFolderZip.getAbsolutePath());
+          }
+          else
+            fail("Cannot create "+fileFileEmpty.getAbsolutePath());
+        }
+        else
+          fail("Cannot make directory "+fileFolderFull.getAbsolutePath());
+      }
+      else
+        fail("Cannot make directory "+fileFolderEmpty.getAbsolutePath());
+    }
+    else
+      fail("Cannot make directories for "+fileFolderUnzip.getAbsolutePath());
+      
   } /* setUp */
 
   @After
   public void tearDown() 
     throws IOException
   {
+    /***
     File fileFolderUnzip = new File(sFOLDER_UNZIP);
     deleteAll(fileFolderUnzip);
     File fileFolderZip = new File(sFOLDER_ZIP);
     deleteAll(fileFolderZip);
+    ***/
   } /* tearDown */
 
   /**
@@ -372,10 +457,8 @@ public class zip64Tester
           fileEntry = new File(sFILE_EMPTY);
         else if (sEntry.equals("full/full.txt"))
           fileEntry = new File(sFILE_FULL);
-        /*** ZIP32 entry is only true if pkzipc was used 
         if (!sOutput.startsWith("- ZIP32 entry"))
           fail("Entry " + sEntry + " must be ZIP32 entry!");
-        ***/
         /* file date/time */
         iPosition = sOutput.indexOf(": ");
         sOutput = sOutput.substring(iPosition+2);
@@ -502,9 +585,14 @@ public class zip64Tester
       sFILE_ZIP
     };
     Execute exec = Execute.execute(asCommand);
+    System.out.println(exec.getStdOut());
     int iExitCode = exec.getResult();
+    System.out.println(exec.getStdOut());
     if (iExitCode != 0)
+    {
+      System.err.println(exec.getStdErr());
       fail("zip64 exit code: "+String.valueOf(iExitCode));
+    }
     if (exec.getStdErr().length() > 0)
         fail("Invalid error: "+exec.getStdErr());
   } /* testInjectReplace */

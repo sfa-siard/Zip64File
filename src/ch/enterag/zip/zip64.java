@@ -433,14 +433,24 @@ public class zip64
         File fileInput = new File(sFileName);
         if (fileInput.isFile())
         {
-          EntryOutputStream eos = zf.openEntryOutputStream(sFileEntry, m_bCompress?FileEntry.iMETHOD_DEFLATED:FileEntry.iMETHOD_STORED, new Date(2000*(long)Math.ceil(fileInput.lastModified()/2000.0)));
-          FileInputStream fis = new FileInputStream(fileInput);
-          byte[] buffer = new byte[BUFFER_SIZE];
-          for (int iRead = fis.read(buffer); iRead >= 0; iRead = fis.read(buffer))
-            eos.write(buffer, 0, iRead);
-          fis.close();
-          eos.close();
-          bCreated = true;
+          FileInputStream fis = null;
+          EntryOutputStream eos = null;
+          try
+          {
+            eos = zf.openEntryOutputStream(sFileEntry, m_bCompress?FileEntry.iMETHOD_DEFLATED:FileEntry.iMETHOD_STORED, new Date(2000*(long)Math.ceil(fileInput.lastModified()/2000.0)));
+            fis = new FileInputStream(fileInput);
+            byte[] buffer = new byte[BUFFER_SIZE];
+            for (int iRead = fis.read(buffer); iRead >= 0; iRead = fis.read(buffer))
+              eos.write(buffer, 0, iRead);
+            bCreated = true;
+          }
+          finally
+          {
+            if (fis != null)
+              fis.close();
+            if (eos != null)
+              eos.close();
+          }
         }
         else
           throw new FileNotFoundException("File "+fileInput.getAbsolutePath()+" cannot be injected, because it does not exist or is not a file!");
@@ -684,10 +694,11 @@ public class zip64
    */
   private void injectArchive(List<String> listFiles, File fileArchive)
   {
+    Zip64File zf = null;
     try
     {
       displayMessage("Injecting into "+fileArchive.getAbsolutePath()+" ...");
-      Zip64File zf = new Zip64File(fileArchive);
+      zf = new Zip64File(fileArchive);
       if (SU.isNotEmpty(m_sZipComment))
         zf.setComment(m_sZipComment);
       List<String> listRelative = getRelativeFileNames(m_fileZipRoot);
@@ -701,12 +712,19 @@ public class zip64
             lInjections++;
         }
       }
-      zf.close();
       displayMessage(SIZE_FORMAT.format(lInjections)+" matching file entries injected.");
       m_iReturn = RETURN_OK;
     }
     catch(FileNotFoundException fnfe) { handleException(fnfe); }
     catch(IOException ie) { handleException(ie); }
+    finally
+    {
+      if (zf != null)
+      {
+        try { zf.close(); }
+        catch(IOException ie) { }
+      }
+    }
   } /* injectArchive */
   
   /*--------------------------------------------------------------------*/

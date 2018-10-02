@@ -43,6 +43,8 @@ public class EntryInputStreamTester
   private final static int iMODERATE_BUFFERS = 200;
   /** global file comment */
   private final static String sZIP_COMMENT = "a global ZIP file comment";
+  /** external ZIP tool */
+  private String sZipTool = "pkzipc.exe";
   /** zip file produced by pkzipc */
   private String m_sPkZipFile = null;
   /** temp directory */
@@ -96,9 +98,10 @@ public class EntryInputStreamTester
     File fileZip = new File(fileTemp.getAbsolutePath()+"\\pktest.zip");
     if (!fileZip.exists())
     {
+      System.out.println("creating "+fileZip.getAbsolutePath());
       String[] asCommand = new String[] 
       {
-        "pkzipc.exe", /* must be ZIP64-capable and in path */
+        sZipTool, /* must be ZIP64-capable and in path */
         "-add=all",
         "-attr=all",
         "-dir=specify",
@@ -108,9 +111,13 @@ public class EntryInputStreamTester
         fileTemp.getAbsolutePath()+"\\*"
       };
       Execute exec = Execute.execute(asCommand);
+      System.out.println(exec.getStdOut());
       int iExitCode = exec.getResult();
       if (iExitCode != 0)
+      {
+        System.err.println(exec.getStdErr());
         fail("pkzipc exit code: "+String.valueOf(iExitCode));
+      }
     }
     m_sPkZipFile = fileZip.getAbsolutePath();
     fileModerate.delete();
@@ -136,6 +143,7 @@ public class EntryInputStreamTester
   @Test
   public void testEntryInputStream()
   {
+    System.out.println("testEntryInputStream");
     try
     {
       Zip64File zf = new Zip64File(m_sPkZipFile,true);
@@ -153,6 +161,7 @@ public class EntryInputStreamTester
   @Test
   public void testAvailable()
   {
+    System.out.println("testAvailable");
     try
     {
       Zip64File zf = new Zip64File(m_sPkZipFile,true);
@@ -173,6 +182,7 @@ public class EntryInputStreamTester
   @Test
   public void testReadByteArrayIntInt()
   {
+    System.out.println("testReadByteArrayIntInt");
     try
     {
       Zip64File zf = new Zip64File(m_sPkZipFile,true);
@@ -197,6 +207,7 @@ public class EntryInputStreamTester
   @Test
   public void testReadByteArray()
   {
+    System.out.println("testReadByteArray");
     try
     {
       Zip64File zf = new Zip64File(m_sPkZipFile,true);
@@ -212,7 +223,7 @@ public class EntryInputStreamTester
       while(iRead != -1)
       {
         lRead = lRead + iRead;
-        if (iRead != iBUFFER_SIZE)
+        if (iRead == 0)
           System.out.println("Unexpected read size "+String.valueOf(iRead)+" at "+String.valueOf(lRead)+"!");
         iRead = eis.read(buf);
       }
@@ -229,6 +240,7 @@ public class EntryInputStreamTester
   @Test
   public void testRead()
   {
+    System.out.println("testRead");
     try
     {
       Zip64File zf = new Zip64File(m_sPkZipFile,true);
@@ -254,6 +266,7 @@ public class EntryInputStreamTester
   @Test
   public void testSkip()
   {
+    System.out.println("testSkip");
     try
     {
       Zip64File zf = new Zip64File(m_sPkZipFile,true);

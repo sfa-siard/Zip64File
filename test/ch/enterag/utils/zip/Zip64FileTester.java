@@ -38,13 +38,16 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipException;
-import junit.framework.TestCase;
+import ch.enterag.utils.lang.Execute;
+
+import static org.junit.Assert.*;
+import org.junit.*;
 
 /*====================================================================*/
 /** Tests Zip64File.
  @author Hartwig Thomas
  */
-public class Zip64FileTester extends TestCase
+public class Zip64FileTester
 {
 	/** buffer size for I/O */
 	private final static int iBUFFER_SIZE = 8192;
@@ -66,15 +69,6 @@ public class Zip64FileTester extends TestCase
   private final static String sTEMP_DIRECTORY = sTEMP_LOCATION + "\\Temp";
 	/** extract directory */
 	private final static String sEXTRACT_DIRECTORY = sTEMP_LOCATION + "\\Extract";
-
-	/*------------------------------------------------------------------*/
-	/**
-	 @param name
-	 */
-	public Zip64FileTester(String name)
-	{
-		super(name);
-	}
 
 	/*------------------------------------------------------------------*/
 	/** append a file to the ZIP64 file.
@@ -424,10 +418,9 @@ public class Zip64FileTester extends TestCase
 	/* (non-Javadoc)
 	 @see junit.framework.TestCase#setUp()
 	 */
-  @Override
-  protected void setUp() throws Exception
+  @Before
+  public void setUp() throws Exception
 	{
-		super.setUp();
 		/* in temp directory: */
 		File fileTemp = new File(sTEMP_DIRECTORY/*SpecialFolder.getUserDataHome("Temp")*/);
 		if (!fileTemp.exists())
@@ -473,29 +466,24 @@ public class Zip64FileTester extends TestCase
     File fileZip = new File(fileTemp.getParentFile().getAbsolutePath()+"\\pktest.zip");
 		if (!fileZip.exists())
 		{
-			String[] asProg = new String[8];
-			asProg[0] = "pkzipc.exe"; /* must be ZIP64-capable and in path */
-			asProg[1] = "-add=all";
-			asProg[2] = "-attr=all";
-			asProg[3] = "-dir=specify";
-			asProg[4] = "-silent=normal";
-			asProg[5] = "-header="+sZIP_COMMENT; /* the whole thing is quoted by Runtime */
-			asProg[6] = fileZip.getAbsolutePath();
-			asProg[7] = fileTemp.getAbsolutePath()+"\\*";
-			try
-			{ 
-				Process procPkZip = Runtime.getRuntime().exec(asProg);
-				InputStream isStdOut = procPkZip.getInputStream();
-				for (int c = isStdOut.read(); c != -1; c = isStdOut.read())
-					System.out.print(c);
-				isStdOut.close();
-				int iExitCode = procPkZip.waitFor();
-				if (iExitCode != 0)
-					fail("pkzipc exit code: "+String.valueOf(iExitCode));
-				procPkZip.destroy();
-			}
-			catch(IOException ie) { fail(ie.getClass().getName()+": "+ie.getMessage());}
-			catch(InterruptedException ie) { fail(ie.getClass().getName()+": "+ie.getMessage());}
+		  System.out.println("zipping everything");
+			String[] asCommand = new String[8];
+			asCommand[0] = "pkzipc.exe"; /* must be ZIP64-capable and in path */
+			asCommand[1] = "-add=all";
+			asCommand[2] = "-attr=all";
+			asCommand[3] = "-dir=specify";
+			asCommand[4] = "-silent=normal";
+			asCommand[5] = "-header="+sZIP_COMMENT; /* the whole thing is quoted by Runtime */
+			asCommand[6] = fileZip.getAbsolutePath();
+			asCommand[7] = fileTemp.getAbsolutePath()+"\\*";
+      Execute exec = Execute.execute(asCommand);
+      System.out.println(exec.getStdOut());
+      int iExitCode = exec.getResult();
+      if (iExitCode != 0)
+      {
+        System.err.println(exec.getStdErr());
+        fail("pkzipc exit code: "+String.valueOf(iExitCode));
+      }
 		}
 		m_sPkZipFile = fileZip.getAbsolutePath();
 	} /* setUp */
@@ -504,17 +492,18 @@ public class Zip64FileTester extends TestCase
 	/* (non-Javadoc)
 	 @see junit.framework.TestCase#tearDown()
 	 */
-  @Override
-  protected void tearDown() throws Exception
+  @After
+  public void tearDown() throws Exception
 	{
-		super.tearDown();
 	}
 
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#Zip64File(java.lang.String, boolean)}.
 	 */
+  @Test
 	public void testZip64FileStringBoolean()
 	{
+	  System.out.println("testZip64FileStringBoolean");
 		/* open pkzip file read-only */
 		try
 		{ 
@@ -528,8 +517,10 @@ public class Zip64FileTester extends TestCase
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#Zip64File(java.io.File, boolean)}.
 	 */
+  @Test
 	public void testZip64FileFileBoolean()
 	{
+    System.out.println("testZip64FileFileBoolean");
     /* open a non-existent zip file read-only (should fail) */
 		try
 		{
@@ -547,8 +538,10 @@ public class Zip64FileTester extends TestCase
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#Zip64File(java.lang.String)}.
 	 */
+  @Test
 	public void testZip64FileString()
 	{
+    System.out.println("testZip64FileString");
 		/* open a non-existent file read/write (should succeed) */
 		try
 		{
@@ -565,8 +558,10 @@ public class Zip64FileTester extends TestCase
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#Zip64File(java.io.File)}.
 	 */
+  @Test
 	public void testZip64FileFile()
 	{
+    System.out.println("testZip64FileFile");
 		/* open pkzip file read/write */
 		try
 		{ 
@@ -581,8 +576,10 @@ public class Zip64FileTester extends TestCase
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#close()}.
 	 */
+  @Test
 	public void testClose()
 	{
+    System.out.println("testClose");
 		/* open non-existent file read/write */
 		try
 		{ 
@@ -599,8 +596,10 @@ public class Zip64FileTester extends TestCase
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#getComment()}.
 	 */
+  @Test
 	public void testGetComment()
 	{
+    System.out.println("testGetComment");
 		/* open pkzip file read-only */
 		try
 		{ 
@@ -618,8 +617,10 @@ public class Zip64FileTester extends TestCase
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#setComment(String)}.
 	 */
+  @Test
 	public void testSetComment()
 	{
+    System.out.println("testSetComment");
 		/* open pkzip file read/write */
 		try
 		{ 
@@ -641,8 +642,10 @@ public class Zip64FileTester extends TestCase
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#getFileEntries()}.
 	 */
+  @Test
 	public void testGetFileEntries()
 	{
+    System.out.println("testGetFileEntries");
 		/* open pkzip file read-only */
 		try
 		{ 
@@ -660,8 +663,10 @@ public class Zip64FileTester extends TestCase
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#getFileEntry(java.lang.String)}.
 	 */
+  @Test
 	public void testGetFileEntry()
 	{
+    System.out.println("testGetFileEntry");
 		/* open pkzip file read-only */
 		try
 		{ 
@@ -686,8 +691,10 @@ public class Zip64FileTester extends TestCase
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#getListFileEntries()}.
 	 */
+  @Test
 	public void testGetListFileEntries()
 	{
+    System.out.println("testGetListFileEntries");
 		/* open pkzip file read-only */
 		try
 		{ 
@@ -726,8 +733,10 @@ public class Zip64FileTester extends TestCase
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#openEntryInputStream(java.lang.String)}.
 	 */
+  @Test
 	public void testOpenEntryInputStream()
 	{
+    System.out.println("testOpenEntryInputStream");
 		/* extract directory */
 		File fileExtract = new File(sEXTRACT_DIRECTORY/*SpecialFolder.getUserDataHome("Extract")*/);
 		if (!fileExtract.exists())
@@ -823,8 +832,10 @@ public class Zip64FileTester extends TestCase
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#openEntryOutputStream(java.lang.String, int, java.util.Date)}.
 	 */
+  @Test
 	public void testOpenEntryOutputStream()
 	{
+    System.out.println("testOpenEntryOutputStream");
 		/* This takes a terrible amount of space in the non-compressed case.
 		 * Therefore we delete the pkzip version first. 
 		 */
@@ -931,8 +942,10 @@ public class Zip64FileTester extends TestCase
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#delete(java.lang.String)}.
 	 */
+  @Test
 	public void testDelete()
 	{
+    System.out.println("testDelete");
 		/* extract directory */
 		File fileExtract = new File(sEXTRACT_DIRECTORY/*SpecialFolder.getUserDataHome("Extract")*/);
 		if (!fileExtract.exists())
