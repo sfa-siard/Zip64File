@@ -33,7 +33,7 @@ import org.junit.*;
 import java.io.*;
 import java.util.*;
 
-import ch.enterag.utils.EU;
+import ch.enterag.utils.*;
 import ch.enterag.utils.lang.*;
 import java.text.*;
 
@@ -75,7 +75,7 @@ public class zip64Tester
   private final static DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
   /** size format of zip64 */
   private static final NumberFormat SIZE_FORMAT = new DecimalFormat("#,##0",new DecimalFormatSymbols()); 
-  /** PKZIPC executable */
+  /** zip executables */
   private ZipProperties _zp = ZipProperties.getInstance();
   private String _sPkZipC = _zp.getPkzipc();
   private String _sZip30 = _zp.getZip30();
@@ -251,13 +251,15 @@ public class zip64Tester
     String[] asProg = new String[] 
     {
       _sZip30,
-      "-q",
       "-r",
-      "-z "+sZIP_COMMENT,
+      "-z",
       fileFileZip.getAbsolutePath(),
-      fileFolderUnzip.getAbsolutePath()
+      "*"
     };
-    Execute exec = Execute.execute(asProg);
+    
+    StringReader rdrInput = new StringReader(sZIP_COMMENT+"\u001A");
+    Execute exec = Execute.execute(asProg,fileFolderUnzip,rdrInput);
+    rdrInput.close();
     System.out.println(exec.getStdOut());
     int iExitCode = exec.getResult();
     if (iExitCode != 0)
