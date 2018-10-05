@@ -254,6 +254,8 @@ public class zip64Tester
       "-r",
       "-z",
       fileFileZip.getAbsolutePath(),
+      ".",
+      "-i",
       "*"
     };
     

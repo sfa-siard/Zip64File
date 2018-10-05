@@ -51,7 +51,7 @@ public class EntryInputStreamTester
   /** zip file produced by pkzipc */
   private String m_sZipFile = null;
   /** temp directory */
-  private final static String sTEMP_DIRECTORY = "tmp\\test";
+  private final static String sTEMP_DIRECTORY = "tmp"+File.separator+"test";
 
   /*------------------------------------------------------------------*/
   /** create file of moderate size.
@@ -115,17 +115,23 @@ public class EntryInputStreamTester
       "-r",
       "-z",
       fileFileZip.getAbsolutePath(),
+      ".",
+      "-i",
       "*"
     };
     
     StringReader rdrInput = new StringReader(sZIP_COMMENT+"\u001A");
     Execute exec = Execute.execute(asProg,fileFolderUnzip,rdrInput);
     rdrInput.close();
-    System.out.println(exec.getStdOut());
+    String sOutput = exec.getStdOut();
+    if (sOutput != null)
+      System.out.println(sOutput);
     int iExitCode = exec.getResult();
     if (iExitCode != 0)
     {
-      System.err.println(exec.getStdErr());
+      String sError = exec.getStdErr();
+      if (sError != null)
+        System.err.println(sError);
       fail(_sZip30+" exit code: "+String.valueOf(iExitCode));
     }
     try { Thread.sleep(100); }
@@ -173,13 +179,13 @@ public class EntryInputStreamTester
     if (!fileTemp.exists())
       fileTemp.mkdirs();
     /* 2.a) write more than 65 KB random file */
-    String sModerateFile = fileTemp.getAbsolutePath()+"\\moderate.txt";
+    String sModerateFile = fileTemp.getAbsolutePath()+File.separator+"moderate.txt";
     File fileModerate = new File(sModerateFile);
     if (fileModerate.exists())
       fileModerate.delete();
     createModerate(fileModerate);
     /* 5. zip everything using pkzipc */
-    File fileZip = new File("tmp\\test.zip");
+    File fileZip = new File("tmp"+File.separator+"test.zip");
     if (fileZip.exists())
       fileZip.delete();
     System.out.println("creating "+fileZip.getAbsolutePath());
