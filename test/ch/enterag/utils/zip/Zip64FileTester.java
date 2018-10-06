@@ -584,8 +584,8 @@ public class Zip64FileTester
     File fileTemp = new File(sTEMP_DIRECTORY);
     /* 5. zip everything using external executable */
     File fileZip = new File(fileTemp.getParentFile().getAbsolutePath()+File.separator+"exttest.zip");
-    if (fileZip.exists())
-      fileZip.delete();
+//    if (fileZip.exists())
+//      fileZip.delete();
     if (!fileZip.exists())
     {
       System.out.println("zipping everything");
@@ -801,6 +801,30 @@ public class Zip64FileTester
 		catch(FileNotFoundException fnfe) { fail(fnfe.getClass().getName()+": "+fnfe.getMessage());}
 		catch(IOException ie) { fail(ie.getClass().getName()+": "+ie.getMessage());}
 	}
+  
+	/**
+	 * Test method for {@link ch.enterag.utils.zip.Zip64File#getListFileEntries()}.
+	 */
+  @Test
+	public void testGetListFileEntriesOld()
+	{
+    System.out.println("testGetListFileEntriesOld");
+		/* open external file read-only */
+		try
+		{ 
+			Zip64File zf = new Zip64File("..\\SiardApi\\testfiles\\sql1999.siard",true);
+			/* get the file entries */
+			List<FileEntry> listFileEntries = zf.getListFileEntries();
+			for (Iterator<FileEntry> iterFileEntry = listFileEntries.iterator(); iterFileEntry.hasNext(); )
+			{
+				FileEntry fe = iterFileEntry.next();
+				System.out.println(fe.getName()+" "+String.valueOf(fe.getSize()));
+			}
+			zf.close();
+		}
+		catch(FileNotFoundException fnfe) { fail(fnfe.getClass().getName()+": "+fnfe.getMessage());}
+		catch(IOException ie) { fail(ie.getClass().getName()+": "+ie.getMessage());}
+	}
 
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#getListFileEntries()}.
@@ -843,7 +867,6 @@ public class Zip64FileTester
 		catch(FileNotFoundException fnfe) { fail(fnfe.getClass().getName()+": "+fnfe.getMessage());}
 		catch(IOException ie) { fail(ie.getClass().getName()+": "+ie.getMessage());}
 	}
-
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#openEntryInputStream(java.lang.String)}.
 	 */
