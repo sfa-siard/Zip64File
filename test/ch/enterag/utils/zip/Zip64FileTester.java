@@ -222,7 +222,7 @@ public class Zip64FileTester
       "*"
     };
     
-    StringReader rdrInput = new StringReader(sZIP_COMMENT+"\u001A");
+    StringReader rdrInput = new StringReader(sZIP_COMMENT);
     Execute exec = Execute.execute(asProg,fileFolderUnzip,rdrInput);
     rdrInput.close();
     System.out.println(exec.getStdOut());
