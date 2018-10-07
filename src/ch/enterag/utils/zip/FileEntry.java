@@ -129,7 +129,7 @@ public class FileEntry
   /** flag for encryption: Bit 0 */
   public static final int iFLAG_ENCRYPTED = 0x00000001;
   /** flag for deferred data (crc, size, compressed size) in local header: Bit 3 */
-  public static final int iFLAG_DEFERRED = 0x00000004;
+  public static final int iFLAG_DEFERRED = 0x00000008;
   /** flag for UTF8: Bit 11 */
   public static final int iFLAG_EFS = 0x00000800;
   /** version needed for reading ZIP files produced by Zip64File */

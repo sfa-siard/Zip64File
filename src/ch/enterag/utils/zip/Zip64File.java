@@ -299,27 +299,31 @@ public class Zip64File
   void getDataDescriptor(FileEntry fe) 
     throws IOException
 	{
-  	/* the flags of the file entry indicate, if a data descriptor is to be expected */
-		if ((fe.getFlags() & FileEntry.iFLAG_DEFERRED) != 0)
+		/* EXT descriptor present */
+		boolean bZip64 = analyzeExtraField(fe);
+		long lFilePointer = m_df.getFilePointer();
+		long l = readLong32();
+    /* the flags of the file entry indicate, if a data descriptor is to be expected */
+		/* if we find a signature, it takes precedence over the deferred flag to support old erroneous flag */
+		if ((l == 0x08074b50) || ((fe.getFlags() & FileEntry.iFLAG_DEFERRED) != 0))
 		{
-			/* EXT descriptor present */
-			boolean bZip64 = analyzeExtraField(fe);
-			long l = readLong32();
-			if (l != 0x08074b50)
-			  fe.setCrc(l);
-			else
-				fe.setCrc(readLong32());
-			if (!bZip64)
-			{
-			  fe.setCompressedSize(readLong32());
-				fe.setSize(readLong32());
-			}
-			else
-			{
-				fe.setCompressedSize(readLong64());
-			  fe.setSize(readLong64());
-			}
+	    if (l != 0x08074b50)
+	      fe.setCrc(l);
+	    else
+	      fe.setCrc(readLong32());
+	    if (!bZip64)
+	    {
+	      fe.setCompressedSize(readLong32());
+	      fe.setSize(readLong32());
+	    }
+	    else
+	    {
+	      fe.setCompressedSize(readLong64());
+	      fe.setSize(readLong64());
+	    }
 		}
+		else /* backup */
+		  m_df.seek(lFilePointer);
 	} /* getDataDescriptor */
 
   /*------------------------------------------------------------------*/
@@ -380,11 +384,15 @@ public class Zip64File
   	{
   		Zip64File.analyzeExtraField(fe);
   		/* restore the necessary lMAX32 for final analysis in getDataDescriptor */
+  		/***
   		if ((fe.getFlags() & FileEntry.iFLAG_DEFERRED) != 0)
   		{
+  		***/
       	fe.setCompressedSize(lCompressedSize);
       	fe.setSize(lSize);
+      /***
   		}
+  		***/
   	}
   	return fe;
   } /* getLocalFileEntry */

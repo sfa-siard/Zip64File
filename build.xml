@@ -211,11 +211,17 @@ Created    : 16.04.2010, Hartwig Thomas
   </target>
   
   <!-- test target runs the tests in zip64Tester -->
+  <condition property="run.tests">
+    <or>
+      <isset property="pkzipc"/> 
+      <isset property="zip30"/> 
+    </or>
+  </condition>
 	<property name="classzip64tester" value="ch.enterag.utils.zip.zip64Tester"/>
   <property name="filezip64test" value="zip64-test"/>
 	<property name="classeistester" value="ch.enterag.utils.zip.EntryInputStreamTester"/>
 	<property name="fileeistest" value="eis-test"/>
-  <target name="test" depends="jar">
+  <target name="test" depends="jar" if="run.tests">
     <echo message="${ant.project.name}: test ${cpenterutils};${dirdist}/${jarfile};${cpjunit}"/>
     <!-- build the tests -->
     <javac debug="true" debuglevel="${debuglevel}"
@@ -249,7 +255,6 @@ Created    : 16.04.2010, Hartwig Thomas
         todir="${dirtmp}"/>
     </junit>
     <sleep milliseconds="10"/> 
-  	<!--
     <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
       <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
       <formatter type="plain"/>
@@ -264,7 +269,6 @@ Created    : 16.04.2010, Hartwig Thomas
       outfile="${fileeistest}"
         todir="${dirtmp}"/>
     </junit>
-    -->
   </target>
   
   <!-- generate the javadocs -->
