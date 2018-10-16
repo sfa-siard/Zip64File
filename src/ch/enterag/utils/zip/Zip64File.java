@@ -302,28 +302,48 @@ public class Zip64File
 		/* EXT descriptor present */
 		boolean bZip64 = analyzeExtraField(fe);
 		long lFilePointer = m_df.getFilePointer();
-		long l = readLong32();
-    /* the flags of the file entry indicate, if a data descriptor is to be expected */
-		/* if we find a signature, it takes precedence over the deferred flag to support old erroneous flag */
-		if ((l == 0x08074b50) || ((fe.getFlags() & FileEntry.iFLAG_DEFERRED) != 0))
+    /* the flags of the file entry indicate, if a data descriptor is to 
+     * be expected */
+		if ((fe.getFlags() & FileEntry.iFLAG_DEFERRED) != 0)
 		{
-	    if (l != 0x08074b50)
-	      fe.setCrc(l);
-	    else
-	      fe.setCrc(readLong32());
-	    if (!bZip64)
-	    {
-	      fe.setCompressedSize(readLong32());
-	      fe.setSize(readLong32());
-	    }
-	    else
-	    {
-	      fe.setCompressedSize(readLong64());
-	      fe.setSize(readLong64());
-	    }
+      long l = readLong32();
+      if (l == 0x08074b50)
+        fe.setCrc(readLong32());
+      else
+        fe.setCrc(l);
+      if (!bZip64)
+      {
+        fe.setCompressedSize(readLong32());
+        fe.setSize(readLong32());
+      }
+      else
+      {
+        fe.setCompressedSize(readLong64());
+        fe.setSize(readLong64());
+      }
 		}
-		else /* backup */
-		  m_df.seek(lFilePointer);
+    /* if we find a signature, it takes precedence over the deferred flag 
+     * to support old erroneous flag handling */
+		if (lFilePointer <= m_lCentralDirectoryStart-4)
+		{
+      long l = readLong32();
+      if (l == 0x08074b50)
+      {
+        fe.setCrc(readLong32());
+        if (!bZip64)
+        {
+          fe.setCompressedSize(readLong32());
+          fe.setSize(readLong32());
+        }
+        else
+        {
+          fe.setCompressedSize(readLong64());
+          fe.setSize(readLong64());
+        }
+      }
+      else /* backup */
+        m_df.seek(lFilePointer);
+		}
 	} /* getDataDescriptor */
 
   /*------------------------------------------------------------------*/
