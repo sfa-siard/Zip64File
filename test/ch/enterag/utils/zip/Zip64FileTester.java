@@ -6,42 +6,17 @@ Description : Tests Zip64File.
 ------------------------------------------------------------------------
 Copyright  : Enter AG, Zurich, Switzerland, 2008
 Created    : 07.03.2008, Hartwig Thomas
-------------------------------------------------------------------------
-The class ch.enterag.utils.zip.Zip64FileTester is free software; you can 
-redistribute it and/or modify it under the terms of the GNU General Public 
-License version 2 or later as published by the Free Software Foundation.
-
-ch.enterag.utils.zip.Zip64FileTester is distributed in the hope that it will 
-be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
-of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-If you have a need for licensing ch.enterag.utils.zip.Zip64FileTester without 
-some of the restrictions specified in the GNU General Public License,
-it is possible to negotiate a different license with the copyright holder.
 ======================================================================*/
 
 package ch.enterag.utils.zip;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.io.StringReader;
-import java.text.DecimalFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.zip.ZipException;
+import java.io.*;
+import java.text.*;
+import java.util.*;
+import java.util.zip.*;
 
-import ch.enterag.utils.EU;
-import ch.enterag.utils.StopWatch;
-import ch.enterag.utils.lang.Execute;
+import ch.enterag.utils.*;
+import ch.enterag.utils.lang.*;
 
 import static org.junit.Assert.*;
 import org.junit.*;
@@ -66,7 +41,9 @@ public class Zip64FileTester
 	private static String m_sExtZipFile = null;
 	/** test zip file */
 	private String m_sTestZipFile = null;
-  /** temp location with lots of free space which does not need to be backupped */
+	/** test files directory */
+	private final static String sTESTFILES_DIRECTORY = "testfiles";
+  /** temp location with lots of free space which does not need to be backuped */
   private final static String sTEMP_LOCATION = "tmp";
   /** temp directory */
   private final static String sTEMP_DIRECTORY = sTEMP_LOCATION + File.separator +"Temp";
@@ -1076,6 +1053,43 @@ public class Zip64FileTester
 		fileSmall.delete();
 	}
 
+  @Test
+  public void testWriteRead()
+  {
+    /* original of moderate file */
+    File fileModerate = new File(sTESTFILES_DIRECTORY+File.separator+"moderate.txt");
+    /* moderate zip file */
+    try
+    {
+      File fileTemp = new File(sTEMP_DIRECTORY);
+      File fileZip = new File(fileTemp.getParentFile().getAbsolutePath()+File.separator+"moderate.zip");
+      
+      Zip64File zf = new Zip64File(fileZip);
+      byte[] buf = new byte[4096];
+      
+      /* write medium file to ZIP file */
+      FileInputStream fis = new FileInputStream(fileModerate);
+      OutputStream os = zf.openEntryOutputStream("moderate", FileEntry.iMETHOD_STORED, null);
+      for (int iRead = fis.read(buf); iRead != -1; iRead = fis.read(buf))
+        os.write(buf,0,iRead);
+      os.close();
+      fis.close();
+      
+      /* read medium file from ZIP file */
+      fileModerate = new File(fileTemp.getAbsolutePath()+File.separator+"moderate.txt");
+      FileOutputStream fos = new FileOutputStream(fileModerate);
+      InputStream is = zf.openEntryInputStream("moderate");
+      for (int iRead = is.read(buf); iRead != -1; iRead = is.read(buf))
+        fos.write(buf, 0, iRead);
+      is.close();
+      fos.close();
+      
+      /* close ZIP file */
+      zf.close();
+    }
+    catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
+  }
+  
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#delete(java.lang.String)}.
 	 */
@@ -1109,7 +1123,7 @@ public class Zip64FileTester
 		/* open it read/write and delete the medium file */
 		try
 		{
-			Zip64File zf = new Zip64File(m_sTestZipFile);
+      Zip64File zf = new Zip64File(m_sTestZipFile);
 			zf.delete("many/small12345.txt");
 			FileEntry nonExistentDel = zf.delete("non-existent");
 			zf.close();

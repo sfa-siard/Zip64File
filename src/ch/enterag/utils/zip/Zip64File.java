@@ -322,9 +322,8 @@ public class Zip64File
         fe.setSize(readLong64());
       }
 		}
-    /* if we find a signature, it takes precedence over the deferred flag 
-     * to support old erroneous flag handling */
-		if (lFilePointer <= m_lCentralDirectoryStart-4)
+    /* if we find a signature, we support old erroneous flag handling */
+		else if (lFilePointer <= m_lCentralDirectoryStart-4)
 		{
       long l = readLong32();
       if (l == 0x08074b50)

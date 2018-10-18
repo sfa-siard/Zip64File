@@ -221,6 +221,8 @@ Created    : 16.04.2010, Hartwig Thomas
   <property name="filezip64test" value="zip64-test"/>
 	<property name="classeistester" value="ch.enterag.utils.zip.EntryInputStreamTester"/>
 	<property name="fileeistest" value="eis-test"/>
+	<property name="classeostester" value="ch.enterag.utils.zip.EntryOutputStreamTester"/>
+	<property name="fileeostest" value="eos-test"/>
   <target name="test" depends="jar" if="run.tests">
     <echo message="${ant.project.name}: test ${cpenterutils};${dirdist}/${jarfile};${cpjunit}"/>
     <!-- build the tests -->
@@ -267,6 +269,20 @@ Created    : 16.04.2010, Hartwig Thomas
       <test 
       name="${classeistester}"
       outfile="${fileeistest}"
+        todir="${dirtmp}"/>
+    </junit>
+    <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+      <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
+      <formatter type="plain"/>
+      <classpath>
+        <pathelement path="${dirbuildtests}"/>
+        <pathelement path="${cpenterutils}"/>
+        <pathelement path="${dirdist}/${jarfile}"/>
+        <pathelement path="${cpjunit}"/>
+      </classpath>
+      <test 
+      name="${classeostester}"
+      outfile="${fileeostest}"
         todir="${dirtmp}"/>
     </junit>
   </target>
