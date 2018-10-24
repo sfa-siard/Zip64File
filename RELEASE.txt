@@ -3,6 +3,7 @@ Release Notes for Zip64File 2.1
 
 2.1.47
 Corrected erroneous deferred flag
+with backward compatibility for bug.
 
 2.1.0
 Release for JAVA 10
