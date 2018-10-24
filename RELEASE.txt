@@ -12,3 +12,6 @@ Scripts for command line added
 2.0.54 
 Published on GitHub
 
+2.1.47
+JAVA 1.8, 9, 10
+Corrected erroneous deferred flag
