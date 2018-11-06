@@ -28,8 +28,9 @@ package ch.enterag.utils.zip;
 import java.io.*;
 import static org.junit.Assert.*;
 import org.junit.*;
-import ch.enterag.utils.io.*;
-import ch.enterag.utils.lang.Execute;
+
+import ch.enterag.utils.*;
+import ch.enterag.utils.lang.*;
 
 /*====================================================================*/
 /** Tests EntryInputStream.
@@ -43,10 +44,14 @@ public class EntryInputStreamTester
   private final static int iMODERATE_BUFFERS = 200;
   /** global file comment */
   private final static String sZIP_COMMENT = "a global ZIP file comment";
+  /** zip executables */
+  private ZipProperties _zp = ZipProperties.getInstance();
+  private String _sPkZipC = _zp.getPkzipc();
+  private String _sZip30 = _zp.getZip30();
   /** zip file produced by pkzipc */
-  private String m_sPkZipFile = null;
+  private String m_sZipFile = null;
   /** temp directory */
-  private final static String sTEMP_DIRECTORY = SpecialFolder.getUserTemp()+File.separator+"temp";
+  private final static String sTEMP_DIRECTORY = "tmp"+File.separator+"test";
 
   /*------------------------------------------------------------------*/
   /** create file of moderate size.
@@ -75,6 +80,92 @@ public class EntryInputStreamTester
     fos.close();
   } /* createModerate */
   
+  private void zipPkZip(File fileFolderUnzip, File fileFileZip)
+  {
+    /* use pkzipc to create zip file in zip directory */
+    String[] asProg = new String[]
+    {
+      _sPkZipC, 
+      "-add=all",
+      "-attr=all",
+      "-dir=specify",
+      "-silent=normal",
+      "-header="+sZIP_COMMENT,
+      fileFileZip.getAbsolutePath(),
+      fileFolderUnzip.getAbsolutePath()+"/*"
+    };
+    Execute exec = Execute.execute(asProg);
+    System.out.println(exec.getStdOut());
+    int iExitCode = exec.getResult();
+    if (iExitCode != 0)
+    {
+      System.err.println(exec.getStdErr());
+      fail(_sPkZipC+" exit code: "+String.valueOf(iExitCode));
+    }
+    try { Thread.sleep(100); }
+    catch(InterruptedException ie) { fail(EU.getExceptionMessage(ie)); }
+  } /* zipPkZip */
+  
+  private void zipInfoZip(File fileFolderUnzip, File fileFileZip)
+  {
+    /* use Info-ZIP zip.exe to create zip file in zip directory */
+    String[] asProg = new String[] 
+    {
+      _sZip30,
+      "-r",
+      "-z",
+      fileFileZip.getAbsolutePath(),
+      ".",
+      "-i",
+      "*"
+    };
+    
+    StringReader rdrInput = new StringReader(sZIP_COMMENT+"\u001A");
+    Execute exec = Execute.execute(asProg,fileFolderUnzip,rdrInput);
+    rdrInput.close();
+    String sOutput = exec.getStdOut();
+    if (sOutput != null)
+      System.out.println(sOutput);
+    int iExitCode = exec.getResult();
+    if (iExitCode != 0)
+    {
+      String sError = exec.getStdErr();
+      if (sError != null)
+        System.err.println(sError);
+      fail(_sZip30+" exit code: "+String.valueOf(iExitCode));
+    }
+    try { Thread.sleep(100); }
+    catch(InterruptedException ie) { fail(EU.getExceptionMessage(ie)); }
+  }
+  
+  private void zip64Zip(File fileFolderUnzip, File fileFileZip)
+  {
+    /* use zip64 to create zip file in zip directory */
+    String[] asProg = new String[] 
+    {
+      "java",
+      "-jar",
+      "dist/zip64.jar",
+      "n",
+      "-d="+fileFolderUnzip.getAbsolutePath(),
+      "-c",
+      "-q",
+      "-r",
+      "-z="+sZIP_COMMENT,
+      fileFileZip.getAbsolutePath()
+    };
+    Execute exec = Execute.execute(asProg);
+    System.out.println(exec.getStdOut());
+    int iExitCode = exec.getResult();
+    if (iExitCode != 0)
+    {
+      System.err.println(exec.getStdErr());
+      fail("zip64 exit code: "+String.valueOf(iExitCode));
+    }
+    try { Thread.sleep(100); }
+    catch(InterruptedException ie) { fail(EU.getExceptionMessage(ie)); }
+  }
+  
   /*------------------------------------------------------------------*/
   /* (non-Javadoc)
    @see junit.framework.TestCase#setUp()
@@ -88,32 +179,23 @@ public class EntryInputStreamTester
     if (!fileTemp.exists())
       fileTemp.mkdirs();
     /* 2.a) write more than 65 KB random file */
-    String sModerateFile = fileTemp.getAbsolutePath()+"\\moderate.txt";
+    String sModerateFile = fileTemp.getAbsolutePath()+File.separator+"moderate.txt";
     File fileModerate = new File(sModerateFile);
-    if (!fileModerate.exists())
-      createModerate(fileModerate);
+    if (fileModerate.exists())
+      fileModerate.delete();
+    createModerate(fileModerate);
     /* 5. zip everything using pkzipc */
-    File fileZip = new File(fileTemp.getAbsolutePath()+"\\pktest.zip");
-    if (!fileZip.exists())
-    {
-      String[] asCommand = new String[] 
-      {
-        "pkzipc.exe", /* must be ZIP64-capable and in path */
-        "-add=all",
-        "-attr=all",
-        "-dir=specify",
-        "-silent=normal",
-        "-header="+sZIP_COMMENT, /* the whole thing is quoted by Runtime */
-        fileZip.getAbsolutePath(),
-        fileTemp.getAbsolutePath()+"\\*"
-      };
-      Execute exec = Execute.execute(asCommand);
-      int iExitCode = exec.getResult();
-      if (iExitCode != 0)
-        fail("pkzipc exit code: "+String.valueOf(iExitCode));
-    }
-    m_sPkZipFile = fileZip.getAbsolutePath();
-    fileModerate.delete();
+    File fileZip = new File("tmp"+File.separator+"test.zip");
+    if (fileZip.exists())
+      fileZip.delete();
+    System.out.println("creating "+fileZip.getAbsolutePath());
+    if (_sPkZipC != null)
+      zipPkZip(fileTemp, fileZip);
+    else if (_sZip30 != null)
+      zipInfoZip(fileTemp, fileZip);
+    else
+      zip64Zip(fileTemp, fileZip);
+    m_sZipFile = fileZip.getAbsolutePath();
   } /* setUp */
 
   /*------------------------------------------------------------------*/
@@ -123,11 +205,6 @@ public class EntryInputStreamTester
   @After
   public void tearDown() throws Exception
   {
-    if (m_sPkZipFile != null)
-    {
-      File fileZip = new File(m_sPkZipFile);
-      fileZip.delete();
-    }
   } /* tearDown */
   
   /**
@@ -136,9 +213,10 @@ public class EntryInputStreamTester
   @Test
   public void testEntryInputStream()
   {
+    System.out.println("testEntryInputStream");
     try
     {
-      Zip64File zf = new Zip64File(m_sPkZipFile,true);
+      Zip64File zf = new Zip64File(m_sZipFile,true);
       EntryInputStream eis = zf.openEntryInputStream("moderate.txt");
       eis.close();
       zf.close();
@@ -153,9 +231,10 @@ public class EntryInputStreamTester
   @Test
   public void testAvailable()
   {
+    System.out.println("testAvailable");
     try
     {
-      Zip64File zf = new Zip64File(m_sPkZipFile,true);
+      Zip64File zf = new Zip64File(m_sZipFile,true);
       EntryInputStream eis = zf.openEntryInputStream("moderate.txt");
       int iAvailable = eis.available();
       if (iAvailable != iMODERATE_BUFFERS*iBUFFER_SIZE)
@@ -173,9 +252,10 @@ public class EntryInputStreamTester
   @Test
   public void testReadByteArrayIntInt()
   {
+    System.out.println("testReadByteArrayIntInt");
     try
     {
-      Zip64File zf = new Zip64File(m_sPkZipFile,true);
+      Zip64File zf = new Zip64File(m_sZipFile,true);
       EntryInputStream eis = zf.openEntryInputStream("moderate.txt");
       byte[] buf = new byte[iBUFFER_SIZE];
       int iRead = eis.read(buf,0,234);
@@ -197,9 +277,10 @@ public class EntryInputStreamTester
   @Test
   public void testReadByteArray()
   {
+    System.out.println("testReadByteArray");
     try
     {
-      Zip64File zf = new Zip64File(m_sPkZipFile,true);
+      Zip64File zf = new Zip64File(m_sZipFile,true);
       EntryInputStream eis = zf.openEntryInputStream("moderate.txt");
       byte[] buf = new byte[iBUFFER_SIZE];
       int iRead = eis.read(buf);
@@ -212,7 +293,7 @@ public class EntryInputStreamTester
       while(iRead != -1)
       {
         lRead = lRead + iRead;
-        if (iRead != iBUFFER_SIZE)
+        if (iRead == 0)
           System.out.println("Unexpected read size "+String.valueOf(iRead)+" at "+String.valueOf(lRead)+"!");
         iRead = eis.read(buf);
       }
@@ -229,9 +310,10 @@ public class EntryInputStreamTester
   @Test
   public void testRead()
   {
+    System.out.println("testRead");
     try
     {
-      Zip64File zf = new Zip64File(m_sPkZipFile,true);
+      Zip64File zf = new Zip64File(m_sZipFile,true);
       EntryInputStream eis = zf.openEntryInputStream("moderate.txt");
       int iRead = eis.read();
       if (iRead < 0)
@@ -254,9 +336,10 @@ public class EntryInputStreamTester
   @Test
   public void testSkip()
   {
+    System.out.println("testSkip");
     try
     {
-      Zip64File zf = new Zip64File(m_sPkZipFile,true);
+      Zip64File zf = new Zip64File(m_sZipFile,true);
       EntryInputStream eis = zf.openEntryInputStream("moderate.txt");
       int iRead = eis.read();
       if (iRead < 0)

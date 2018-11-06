@@ -211,11 +211,19 @@ Created    : 16.04.2010, Hartwig Thomas
   </target>
   
   <!-- test target runs the tests in zip64Tester -->
+  <condition property="run.tests">
+    <or>
+      <isset property="pkzipc"/> 
+      <isset property="zip30"/> 
+    </or>
+  </condition>
 	<property name="classzip64tester" value="ch.enterag.utils.zip.zip64Tester"/>
   <property name="filezip64test" value="zip64-test"/>
 	<property name="classeistester" value="ch.enterag.utils.zip.EntryInputStreamTester"/>
 	<property name="fileeistest" value="eis-test"/>
-  <target name="test" depends="jar">
+	<property name="classeostester" value="ch.enterag.utils.zip.EntryOutputStreamTester"/>
+	<property name="fileeostest" value="eos-test"/>
+  <target name="test" depends="jar" if="run.tests">
     <echo message="${ant.project.name}: test ${cpenterutils};${dirdist}/${jarfile};${cpjunit}"/>
     <!-- build the tests -->
     <javac debug="true" debuglevel="${debuglevel}"
@@ -234,6 +242,7 @@ Created    : 16.04.2010, Hartwig Thomas
       </classpath>
     </javac>
     <!-- run the tests -->
+  	<echo message="test ${classzip64tester}"/>
     <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
       <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
       <formatter type="plain"/>
@@ -249,7 +258,7 @@ Created    : 16.04.2010, Hartwig Thomas
         todir="${dirtmp}"/>
     </junit>
     <sleep milliseconds="10"/> 
-  	<!--
+  	<echo message="test ${classeistester}"/>
     <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
       <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
       <formatter type="plain"/>
@@ -264,7 +273,21 @@ Created    : 16.04.2010, Hartwig Thomas
       outfile="${fileeistest}"
         todir="${dirtmp}"/>
     </junit>
-    -->
+  	<echo message="test ${classeostester}"/>
+    <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+      <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
+      <formatter type="plain"/>
+      <classpath>
+        <pathelement path="${dirbuildtests}"/>
+        <pathelement path="${cpenterutils}"/>
+        <pathelement path="${dirdist}/${jarfile}"/>
+        <pathelement path="${cpjunit}"/>
+      </classpath>
+      <test 
+      name="${classeostester}"
+      outfile="${fileeostest}"
+        todir="${dirtmp}"/>
+    </junit>
   </target>
   
   <!-- generate the javadocs -->

@@ -6,45 +6,26 @@ Description : Tests Zip64File.
 ------------------------------------------------------------------------
 Copyright  : Enter AG, Zurich, Switzerland, 2008
 Created    : 07.03.2008, Hartwig Thomas
-------------------------------------------------------------------------
-The class ch.enterag.utils.zip.Zip64FileTester is free software; you can 
-redistribute it and/or modify it under the terms of the GNU General Public 
-License version 2 or later as published by the Free Software Foundation.
-
-ch.enterag.utils.zip.Zip64FileTester is distributed in the hope that it will 
-be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
-of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-If you have a need for licensing ch.enterag.utils.zip.Zip64FileTester without 
-some of the restrictions specified in the GNU General Public License,
-it is possible to negotiate a different license with the copyright holder.
 ======================================================================*/
 
 package ch.enterag.utils.zip;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
-import java.text.DecimalFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.zip.ZipException;
-import junit.framework.TestCase;
+import java.io.*;
+import java.text.*;
+import java.util.*;
+import java.util.zip.*;
+
+import ch.enterag.utils.*;
+import ch.enterag.utils.lang.*;
+
+import static org.junit.Assert.*;
+import org.junit.*;
 
 /*====================================================================*/
 /** Tests Zip64File.
  @author Hartwig Thomas
  */
-public class Zip64FileTester extends TestCase
+public class Zip64FileTester
 {
 	/** buffer size for I/O */
 	private final static int iBUFFER_SIZE = 8192;
@@ -56,25 +37,23 @@ public class Zip64FileTester extends TestCase
 	private final static int iMODERATE_BUFFERS = 20;
 	/** global file comment */
 	private final static String sZIP_COMMENT = "a global ZIP file comment";
-	/** zip file produced by pkzipc */
-	private String m_sPkZipFile = null;
+	/** zip file produced by external zip */
+	private static String m_sExtZipFile = null;
 	/** test zip file */
 	private String m_sTestZipFile = null;
-  /** temp location with lots of free space which does not need to be backupped */
-  private final static String sTEMP_LOCATION = "D:\\Temp";
+	/** test files directory */
+	private final static String sTESTFILES_DIRECTORY = "testfiles";
+  /** temp location with lots of free space which does not need to be backuped */
+  private final static String sTEMP_LOCATION = "tmp";
   /** temp directory */
-  private final static String sTEMP_DIRECTORY = sTEMP_LOCATION + "\\Temp";
+  private final static String sTEMP_DIRECTORY = sTEMP_LOCATION + File.separator +"Temp";
 	/** extract directory */
-	private final static String sEXTRACT_DIRECTORY = sTEMP_LOCATION + "\\Extract";
-
-	/*------------------------------------------------------------------*/
-	/**
-	 @param name
-	 */
-	public Zip64FileTester(String name)
-	{
-		super(name);
-	}
+	private final static String sEXTRACT_DIRECTORY = sTEMP_LOCATION + File.separator +"Extract";
+  /** zip executables */
+  private static ZipProperties _zp = ZipProperties.getInstance();
+  private static String _sPkZipC = _zp.getPkzipc();
+  private static String _sZip30 = _zp.getZip30();
+  private static String _sUnzip60 = _zp.getUnzip60();
 
 	/*------------------------------------------------------------------*/
 	/** append a file to the ZIP64 file.
@@ -127,22 +106,28 @@ public class Zip64FileTester extends TestCase
 		try
 		{
 			/* temp directory */
-			File fileTemp = new File(sTEMP_DIRECTORY/*SpecialFolder.getUserDataHome("Temp")*/);
+			File fileTemp = new File(sTEMP_DIRECTORY);
 			if (!fileTemp.exists())
 				fileTemp.mkdirs();
 			/* original of moderate file */
-			File fileModerateOriginal = new File(fileTemp.getAbsolutePath()+"\\moderate.txt");
+			File fileModerateOriginal = new File(fileTemp.getAbsolutePath()+File.separator+"moderate.txt");
 			/* original of medium file */
-			File fileMediumOriginal = new File(fileTemp.getAbsolutePath()+"\\medium.txt");
+			File fileMediumOriginal = new File(fileTemp.getAbsolutePath()+File.separator+"medium.txt");
 			/* original of large file */
-			File fileLargeOriginal = new File(fileTemp.getAbsolutePath()+"\\large.txt");
+			File fileLargeOriginal = new File(fileTemp.getAbsolutePath()+File.separator+"large.txt");
 			/* test zip file */
+	    System.out.println("Create "+m_sTestZipFile);
+	    StopWatch sw = StopWatch.getInstance();
+	    sw.start();
 			Zip64File zf = new Zip64File(m_sTestZipFile);
 			/* add moderate */
+      System.out.println("add "+fileModerateOriginal.getAbsolutePath());
 			appendFile(zf,"moderate.txt",fileModerateOriginal,iMethod);
 			/* add medium */
+      System.out.println("add "+fileMediumOriginal.getAbsolutePath());
 			appendFile(zf,"medium.txt",fileMediumOriginal,iMethod);
 			/* add large */
+      System.out.println("add "+fileLargeOriginal.getAbsolutePath());
 			appendFile(zf,"large.txt",fileLargeOriginal,iMethod);
 			/* add directory many */
 			appendDirectory(zf,"many/");
@@ -151,16 +136,134 @@ public class Zip64FileTester extends TestCase
 			{
 				DecimalFormat df = new DecimalFormat("00000");
 				String sSmallFile = "small"+df.format(Long.valueOf(iSmall))+".txt";
-				File fileSmallSource = new File(fileTemp.getAbsolutePath()+"\\many\\"+sSmallFile);
+				File fileSmallSource = new File(fileTemp.getAbsolutePath()+File.separator+"many"+File.separator+sSmallFile);
+        if ((iSmall % 10000) == 0)
+          System.out.println("add "+fileSmallSource.getAbsolutePath());
 				appendFile(zf,"many/"+sSmallFile,fileSmallSource,iMethod);
 			}
 			/* write the central directory */
 			zf.close();
+			sw.stop();
+      System.out.println("Closed "+m_sTestZipFile+" after "+sw.formatMs()+" ms");
 		}
 		catch(FileNotFoundException fnfe) { fail(fnfe.getClass().getName()+": "+fnfe.getMessage());}
 		catch(IOException ie) { fail(ie.getClass().getName()+": "+ie.getMessage());}
 	} /* zipTest */
 
+  private static void zipPkZip(File fileFolderUnzip, File fileFileZip)
+  {
+    System.out.println("(pkzipc) zip all files in "+fileFolderUnzip.getAbsolutePath()+" to "+fileFileZip.getAbsolutePath());
+    StopWatch sw = StopWatch.getInstance();
+    sw.start();
+    /* use pkzipc to create zip file in zip directory */
+    String[] asProg = new String[]
+    {
+      _sPkZipC, 
+      "-add=all",
+      "-attr=all",
+      "-dir=specify",
+      "-silent=normal",
+      "-header="+sZIP_COMMENT,
+      fileFileZip.getAbsolutePath(),
+      fileFolderUnzip.getAbsolutePath()+"/*"
+    };
+    Execute exec = Execute.execute(asProg);
+    System.out.println(exec.getStdOut());
+    int iExitCode = exec.getResult();
+    if (iExitCode != 0)
+    {
+      System.err.println(exec.getStdErr());
+      fail(_sPkZipC+" exit code: "+String.valueOf(iExitCode));
+    }
+    sw.stop();
+    System.out.println("pkzipc finished in "+sw.formatMs()+" ms");
+    try { Thread.sleep(100); }
+    catch(InterruptedException ie) { fail(EU.getExceptionMessage(ie)); }
+  } /* zipPkZip */
+  
+  private static void zipInfoZip(File fileFolderUnzip, File fileFileZip)
+  {
+    System.out.println("(Info-Zip) zip all files in "+fileFolderUnzip.getAbsolutePath()+" to "+fileFileZip.getAbsolutePath());
+    StopWatch sw = StopWatch.getInstance();
+    sw.start();
+    /* use Info-ZIP zip.exe to create zip file in zip directory */
+    String[] asProg = new String[] 
+    {
+      _sZip30,
+      "-q",
+      "-r",
+      "-z",
+      fileFileZip.getAbsolutePath(),
+      ".",
+      "-i",
+      "*"
+    };
+    
+    StringReader rdrInput = new StringReader(sZIP_COMMENT);
+    Execute exec = Execute.execute(asProg,fileFolderUnzip,rdrInput);
+    rdrInput.close();
+    System.out.println(exec.getStdOut());
+    int iExitCode = exec.getResult();
+    if (iExitCode != 0)
+    {
+      System.err.println(exec.getStdErr());
+      fail(_sZip30+" exit code: "+String.valueOf(iExitCode));
+    }
+    sw.stop();
+    System.out.println("zip finished in "+sw.formatMs()+" ms");
+    try { Thread.sleep(100); }
+    catch(InterruptedException ie) { fail(EU.getExceptionMessage(ie)); }
+  }
+  
+  private boolean unzipPkZip(String sEntryName, File fileExtract)
+  {
+    System.out.println("(pkzipc) unzip file "+sEntryName+" from "+m_sTestZipFile+" to "+fileExtract.getAbsolutePath());
+    /* extract the moderate file */
+    String[] asProg = new String[]
+    {
+      _sPkZipC, 
+      "-extract",
+      "-attr=all",
+      "-directories",
+      "-silent=normal",
+      m_sTestZipFile,
+      sEntryName,
+      fileExtract.getAbsolutePath()+File.separator+""
+    };
+    Execute exec = Execute.execute(asProg);
+    System.out.println(exec.getStdOut());
+    int iExitCode = exec.getResult();
+    if (iExitCode != 0)
+      System.err.println(exec.getStdErr());
+    try { Thread.sleep(100); }
+    catch(InterruptedException ie) { fail(EU.getExceptionMessage(ie)); }
+    return (iExitCode == 0);
+  } /* unzipPkZip */
+  
+  private boolean unzipZipInfo(String sEntryName, File fileExtract)
+  {
+    System.out.println("(Info-ZIP) unzip file "+sEntryName+" from "+m_sTestZipFile+" to "+fileExtract.getAbsolutePath());
+    /* extract the moderate file */
+    String[] asProg = new String[]
+    {
+      _sUnzip60,
+      "-q",
+      "-o",
+      "-d",
+      fileExtract.getAbsolutePath(),
+      m_sTestZipFile,
+      sEntryName,
+    };
+    Execute exec = Execute.execute(asProg);
+    System.out.println(exec.getStdOut());
+    int iExitCode = exec.getResult();
+    if (iExitCode != 0)
+      System.err.println(exec.getStdErr());
+    try { Thread.sleep(100); }
+    catch(InterruptedException ie) { fail(EU.getExceptionMessage(ie)); }
+    return (iExitCode == 0);
+  } /* unzipZipInfo */
+  
 	/*------------------------------------------------------------------*/
 	/** extract a file entry from the ZIP64 file.
 	 * @param sEntryName name of file entry.
@@ -170,33 +273,15 @@ public class Zip64FileTester extends TestCase
 	{
 		boolean bExtracted = false;
 		/* temp directory */
-		File fileExtract = new File(sEXTRACT_DIRECTORY/*SpecialFolder.getUserDataHome("Extract")*/);
+		File fileExtract = new File(sEXTRACT_DIRECTORY);
 		if (!fileExtract.exists())
 			fileExtract.mkdirs();
-		/* extract the moderate file */
-		String[] asProg = new String[8];
-		asProg[0] = "pkzipc.exe";
-		asProg[1] = "-extract";
-		asProg[2] = "-attr=all";
-		asProg[3] = "-directories";
-		asProg[4] = "-silent=normal";
-		asProg[5] = m_sTestZipFile;
-		asProg[6] = sEntryName;
-		asProg[7] = fileExtract.getAbsolutePath()+"\\";
-		try
-		{ 
-			Process procPkZip = Runtime.getRuntime().exec(asProg);
-			InputStream isStdOut = procPkZip.getInputStream();
-			for (int c = isStdOut.read(); c != -1; c = isStdOut.read())
-				System.out.print(c);
-			isStdOut.close();
-			int iExitCode = procPkZip.waitFor();
-			if (iExitCode == 0)
-				bExtracted = true;
-			procPkZip.destroy();
-		}
-		catch(IOException ie) { System.out.println(ie.getClass().getName()+": "+ie.getMessage());}
-		catch(InterruptedException ie) { System.out.println(ie.getClass().getName()+": "+ie.getMessage());}
+		if (fileExtract.exists())
+		  fileExtract.delete();
+		if (_sPkZipC != null)
+		  bExtracted = unzipPkZip(sEntryName,fileExtract);
+		else if (_sUnzip60 != null)
+		  bExtracted = unzipZipInfo(sEntryName,fileExtract);
 		return bExtracted;
 	}
 	
@@ -309,7 +394,7 @@ public class Zip64FileTester extends TestCase
    * @throws FileNotFoundException if folder does not exist.
    * @throws IOException if an I/O error occurred.
    */
-	private void createLarge(File fileLarge)
+	private static void createLarge(File fileLarge)
 	  throws FileNotFoundException, IOException
 	{
 		System.out.println("writing large file");
@@ -336,7 +421,7 @@ public class Zip64FileTester extends TestCase
    * @throws FileNotFoundException if folder does not exist.
    * @throws IOException if an I/O error occurred.
    */
-	private void createMedium(File fileMedium)
+	private static void createMedium(File fileMedium)
 	  throws FileNotFoundException, IOException
 	{
 		System.out.println("writing medium file");
@@ -379,7 +464,7 @@ public class Zip64FileTester extends TestCase
    * @throws FileNotFoundException if folder does not exist.
    * @throws IOException if an I/O error occurred.
    */
-	private void createModerate(File fileModerate)
+	private static void createModerate(File fileModerate)
 	  throws FileNotFoundException, IOException
 	{
 		System.out.println("writing moderate file");
@@ -406,7 +491,7 @@ public class Zip64FileTester extends TestCase
    * @throws FileNotFoundException if folder does not exist.
    * @throws IOException if an I/O error occurred.
    */
-	private void createSmall(File fileSmall)
+	private static void createSmall(File fileSmall)
 	  throws FileNotFoundException, IOException
 	{
 	  FileOutputStream fos = new FileOutputStream(fileSmall);
@@ -420,105 +505,100 @@ public class Zip64FileTester extends TestCase
 	  fos.close();
 	} /* createLarge */
 	
+	@BeforeClass
+	public static void setupClass()
+	{
+    try
+    {
+      /* in temp directory: */
+      File fileTemp = new File(sTEMP_DIRECTORY);
+      if (!fileTemp.exists())
+        fileTemp.mkdirs();
+      /* 1. write more than 4 GB incompressible random file "large" */
+      String sLargeFile = fileTemp.getAbsolutePath()+File.separator+"large.txt";
+      File fileLarge = new File(sLargeFile);
+      if (!fileLarge.exists())
+        createLarge(fileLarge);
+      /* 2. write more than 4 GB random file which can be compressed to less than 4 GB "medium" */
+      String sMediumFile = fileTemp.getAbsolutePath()+File.separator+"medium.txt";
+      File fileMedium = new File(sMediumFile);
+      if (!fileMedium.exists())
+        createMedium(fileMedium);
+      /* 2.a) write more than 65 KB random file */
+      String sModerateFile = fileTemp.getAbsolutePath()+File.separator+"moderate.txt";
+      File fileModerate = new File(sModerateFile);
+      if (!fileModerate.exists())
+        createModerate(fileModerate);
+      /* 3. create sub directory "many" */
+      String sManyFolder = fileTemp.getAbsolutePath()+File.separator+"many"+File.separator;
+      File fileMany = new File(sManyFolder);
+      if (!fileMany.exists())
+      {
+        System.out.println("writing small files");
+        fileMany.mkdir();
+        /* 4. write more than 65'000 small files "small00001" - "smallxxxxx" */
+        for (int i = 0; i < 0x014000; i++)
+        {
+          DecimalFormat df = new DecimalFormat("00000");
+          String sSmallFile = fileMany.getAbsolutePath()+File.separator+"small"+df.format(Long.valueOf(i))+".txt";
+          File fileSmall = new File(sSmallFile);
+          if (!fileSmall.exists())
+            createSmall(fileSmall);
+        }
+      }
+    }
+    catch(FileNotFoundException fnfe) { fail(EU.getExceptionMessage(fnfe)); }
+    catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
+	} /* setupClass */
+	
 	/*------------------------------------------------------------------*/
 	/* (non-Javadoc)
 	 @see junit.framework.TestCase#setUp()
 	 */
-  @Override
-  protected void setUp() throws Exception
+  @Before
+  public void setUp() throws Exception
 	{
-		super.setUp();
-		/* in temp directory: */
-		File fileTemp = new File(sTEMP_DIRECTORY/*SpecialFolder.getUserDataHome("Temp")*/);
-		if (!fileTemp.exists())
-			fileTemp.mkdirs();
+    File fileTemp = new File(sTEMP_DIRECTORY);
+    /* 5. zip everything using external executable */
+    File fileZip = new File(fileTemp.getParentFile().getAbsolutePath()+File.separator+"exttest.zip");
+//    if (fileZip.exists())
+//      fileZip.delete();
+    if (!fileZip.exists())
+    {
+      System.out.println("zipping everything");
+      if (_sPkZipC != null)
+        zipPkZip(fileTemp, fileZip);
+      else if (_sZip30 != null)
+        zipInfoZip(fileTemp, fileZip);
+      m_sExtZipFile = fileZip.getAbsolutePath();
+    }
 		/* 0. delete all zip files created below */
-		File fileTest = new File(fileTemp.getParentFile().getAbsolutePath()+"\\test.zip");
+		File fileTest = new File(fileTemp.getParentFile().getAbsolutePath()+File.separator+"test.zip");
 		if (fileTest.exists())
 			fileTest.delete();
 		m_sTestZipFile = fileTest.getAbsolutePath();
-		/* 1. write more than 4 GB incompressible random file "large" */
-		String sLargeFile = fileTemp.getAbsolutePath()+"\\large.txt";
-		File fileLarge = new File(sLargeFile);
-		if (!fileLarge.exists())
-			createLarge(fileLarge);
-		/* 2. write more than 4 GB random file which can be compressed to less than 4 GB "medium" */
-		String sMediumFile = fileTemp.getAbsolutePath()+"\\medium.txt";
-		File fileMedium = new File(sMediumFile);
-		if (!fileMedium.exists())
-			createMedium(fileMedium);
-		/* 2.a) write more than 65 KB random file */
-		String sModerateFile = fileTemp.getAbsolutePath()+"\\moderate.txt";
-		File fileModerate = new File(sModerateFile);
-		if (!fileModerate.exists())
-			createModerate(fileModerate);
-		/* 3. create sub directory "many" */
-		String sManyFolder = fileTemp.getAbsolutePath()+"\\many\\";
-		File fileMany = new File(sManyFolder);
-		if (!fileMany.exists())
-		{
-			System.out.println("writing small files");
-		  fileMany.mkdir();
-			/* 4. write more than 65'000 small files "small00001" - "smallxxxxx" */
-			for (int i = 0; i < 0x014000; i++)
-			{
-				DecimalFormat df = new DecimalFormat("00000");
-				String sSmallFile = fileMany.getAbsolutePath()+"\\small"+df.format(Long.valueOf(i))+".txt";
-				File fileSmall = new File(sSmallFile);
-				if (!fileSmall.exists())
-					createSmall(fileSmall);
-			}
-		}
-		/* 5. zip everything using pkzipc */
-    File fileZip = new File(fileTemp.getParentFile().getAbsolutePath()+"\\pktest.zip");
-		if (!fileZip.exists())
-		{
-			String[] asProg = new String[8];
-			asProg[0] = "pkzipc.exe"; /* must be ZIP64-capable and in path */
-			asProg[1] = "-add=all";
-			asProg[2] = "-attr=all";
-			asProg[3] = "-dir=specify";
-			asProg[4] = "-silent=normal";
-			asProg[5] = "-header="+sZIP_COMMENT; /* the whole thing is quoted by Runtime */
-			asProg[6] = fileZip.getAbsolutePath();
-			asProg[7] = fileTemp.getAbsolutePath()+"\\*";
-			try
-			{ 
-				Process procPkZip = Runtime.getRuntime().exec(asProg);
-				InputStream isStdOut = procPkZip.getInputStream();
-				for (int c = isStdOut.read(); c != -1; c = isStdOut.read())
-					System.out.print(c);
-				isStdOut.close();
-				int iExitCode = procPkZip.waitFor();
-				if (iExitCode != 0)
-					fail("pkzipc exit code: "+String.valueOf(iExitCode));
-				procPkZip.destroy();
-			}
-			catch(IOException ie) { fail(ie.getClass().getName()+": "+ie.getMessage());}
-			catch(InterruptedException ie) { fail(ie.getClass().getName()+": "+ie.getMessage());}
-		}
-		m_sPkZipFile = fileZip.getAbsolutePath();
 	} /* setUp */
 
 	/*------------------------------------------------------------------*/
 	/* (non-Javadoc)
 	 @see junit.framework.TestCase#tearDown()
 	 */
-  @Override
-  protected void tearDown() throws Exception
+  @After
+  public void tearDown() throws Exception
 	{
-		super.tearDown();
 	}
 
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#Zip64File(java.lang.String, boolean)}.
 	 */
+  @Test
 	public void testZip64FileStringBoolean()
 	{
+	  System.out.println("testZip64FileStringBoolean");
 		/* open pkzip file read-only */
 		try
 		{ 
-			Zip64File zf = new Zip64File(m_sPkZipFile,true);
+			Zip64File zf = new Zip64File(m_sExtZipFile,true);
 			zf.close();
 		}
 		catch(FileNotFoundException fnfe) { fail(fnfe.getClass().getName()+": "+fnfe.getMessage());}
@@ -528,8 +608,10 @@ public class Zip64FileTester extends TestCase
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#Zip64File(java.io.File, boolean)}.
 	 */
+  @Test
 	public void testZip64FileFileBoolean()
 	{
+    System.out.println("testZip64FileFileBoolean");
     /* open a non-existent zip file read-only (should fail) */
 		try
 		{
@@ -547,8 +629,10 @@ public class Zip64FileTester extends TestCase
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#Zip64File(java.lang.String)}.
 	 */
+  @Test
 	public void testZip64FileString()
 	{
+    System.out.println("testZip64FileString");
 		/* open a non-existent file read/write (should succeed) */
 		try
 		{
@@ -565,12 +649,14 @@ public class Zip64FileTester extends TestCase
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#Zip64File(java.io.File)}.
 	 */
+  @Test
 	public void testZip64FileFile()
 	{
+    System.out.println("testZip64FileFile");
 		/* open pkzip file read/write */
 		try
 		{ 
-			File fileZip = new File(m_sPkZipFile);
+			File fileZip = new File(m_sExtZipFile);
 			Zip64File zf = new Zip64File(fileZip);
 			zf.close();
 		}
@@ -581,8 +667,10 @@ public class Zip64FileTester extends TestCase
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#close()}.
 	 */
+  @Test
 	public void testClose()
 	{
+    System.out.println("testClose");
 		/* open non-existent file read/write */
 		try
 		{ 
@@ -599,12 +687,14 @@ public class Zip64FileTester extends TestCase
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#getComment()}.
 	 */
+  @Test
 	public void testGetComment()
 	{
+    System.out.println("testGetComment");
 		/* open pkzip file read-only */
 		try
 		{ 
-			Zip64File zf = new Zip64File(m_sPkZipFile,true);
+			Zip64File zf = new Zip64File(m_sExtZipFile,true);
 			/* check the comment */
 			String sComment = zf.getComment();
 			if (!sZIP_COMMENT.equals(sComment))
@@ -618,8 +708,10 @@ public class Zip64FileTester extends TestCase
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#setComment(String)}.
 	 */
+  @Test
 	public void testSetComment()
 	{
+    System.out.println("testSetComment");
 		/* open pkzip file read/write */
 		try
 		{ 
@@ -641,12 +733,14 @@ public class Zip64FileTester extends TestCase
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#getFileEntries()}.
 	 */
+  @Test
 	public void testGetFileEntries()
 	{
+    System.out.println("testGetFileEntries");
 		/* open pkzip file read-only */
 		try
 		{ 
-			Zip64File zf = new Zip64File(m_sPkZipFile,true);
+			Zip64File zf = new Zip64File(m_sExtZipFile,true);
 			/* get the number of file entries */
 			int iFileEntries = zf.getFileEntries();
 			if (iFileEntries != 0x00014004)
@@ -660,12 +754,14 @@ public class Zip64FileTester extends TestCase
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#getFileEntry(java.lang.String)}.
 	 */
+  @Test
 	public void testGetFileEntry()
 	{
+    System.out.println("testGetFileEntry");
 		/* open pkzip file read-only */
 		try
 		{ 
-			Zip64File zf = new Zip64File(m_sPkZipFile,true);
+			Zip64File zf = new Zip64File(m_sExtZipFile,true);
 			/* get the medium file entry */
 			FileEntry feMedium = zf.getFileEntry("medium.txt");
 			if (feMedium != null)
@@ -682,20 +778,46 @@ public class Zip64FileTester extends TestCase
 		catch(FileNotFoundException fnfe) { fail(fnfe.getClass().getName()+": "+fnfe.getMessage());}
 		catch(IOException ie) { fail(ie.getClass().getName()+": "+ie.getMessage());}
 	}
+  
+	/**
+	 * Test method for {@link ch.enterag.utils.zip.Zip64File#getListFileEntries()}.
+	 */
+  @Test
+	public void testGetListFileEntriesOld()
+	{
+    System.out.println("testGetListFileEntriesOld");
+		/* open external file read-only */
+		try
+		{ 
+			Zip64File zf = new Zip64File("..\\SiardApi\\testfiles\\sql1999.siard",true);
+			/* get the file entries */
+			List<FileEntry> listFileEntries = zf.getListFileEntries();
+			for (Iterator<FileEntry> iterFileEntry = listFileEntries.iterator(); iterFileEntry.hasNext(); )
+			{
+				FileEntry fe = iterFileEntry.next();
+				System.out.println(fe.getName()+" "+String.valueOf(fe.getSize()));
+			}
+			zf.close();
+		}
+		catch(FileNotFoundException fnfe) { fail(fnfe.getClass().getName()+": "+fnfe.getMessage());}
+		catch(IOException ie) { fail(ie.getClass().getName()+": "+ie.getMessage());}
+	}
 
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#getListFileEntries()}.
 	 */
+  @Test
 	public void testGetListFileEntries()
 	{
-		/* open pkzip file read-only */
+    System.out.println("testGetListFileEntries");
+		/* open external file read-only */
 		try
 		{ 
 			String sPrefix = "many/small";
 			String sSuffix = ".txt";
 			int iPrefixEnd = sPrefix.length();
 			int iSuffixStart = iPrefixEnd + 5;
-			Zip64File zf = new Zip64File(m_sPkZipFile,true);
+			Zip64File zf = new Zip64File(m_sExtZipFile,true);
 			/* get the file entries */
 			List<FileEntry> listFileEntries = zf.getListFileEntries();
 			for (Iterator<FileEntry> iterFileEntry = listFileEntries.iterator(); iterFileEntry.hasNext(); )
@@ -722,26 +844,27 @@ public class Zip64FileTester extends TestCase
 		catch(FileNotFoundException fnfe) { fail(fnfe.getClass().getName()+": "+fnfe.getMessage());}
 		catch(IOException ie) { fail(ie.getClass().getName()+": "+ie.getMessage());}
 	}
-
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#openEntryInputStream(java.lang.String)}.
 	 */
+  @Test
 	public void testOpenEntryInputStream()
 	{
+    System.out.println("testOpenEntryInputStream");
 		/* extract directory */
 		File fileExtract = new File(sEXTRACT_DIRECTORY/*SpecialFolder.getUserDataHome("Extract")*/);
 		if (!fileExtract.exists())
 			fileExtract.mkdirs();
 		/* large file */
-		File fileLarge = new File(fileExtract.getAbsolutePath()+"\\large.txt");
+		File fileLarge = new File(fileExtract.getAbsolutePath()+File.separator+"large.txt");
 		if (fileLarge.exists())
 			fileLarge.delete();
 		/* medium file */
-		File fileMedium = new File(fileExtract.getAbsolutePath()+"\\medium.txt");
+		File fileMedium = new File(fileExtract.getAbsolutePath()+File.separator+"medium.txt");
 		if (fileMedium.exists())
 			fileMedium.delete();
 		/* small file */
-		File fileSmall = new File(fileExtract.getAbsolutePath()+"\\small.txt");
+		File fileSmall = new File(fileExtract.getAbsolutePath()+File.separator+"small.txt");
 		if (fileSmall.exists())
 			fileSmall.delete();
 		/* temp directory */
@@ -749,16 +872,16 @@ public class Zip64FileTester extends TestCase
 		if (!fileTemp.exists())
 			fileTemp.mkdirs();
 		/* original of large file */
-		File fileLargeOriginal = new File(fileTemp.getAbsolutePath()+"\\large.txt");
+		File fileLargeOriginal = new File(fileTemp.getAbsolutePath()+File.separator+"large.txt");
 		/* original of medium file */
-		File fileMediumOriginal = new File(fileTemp.getAbsolutePath()+"\\medium.txt");
+		File fileMediumOriginal = new File(fileTemp.getAbsolutePath()+File.separator+"medium.txt");
 		/* original of small file */
-		File fileSmallOriginal = new File(fileTemp.getAbsolutePath()+"\\many\\small13854.txt");
+		File fileSmallOriginal = new File(fileTemp.getAbsolutePath()+File.separator+"many"+File.separator+"small13854.txt");
 		byte[] buffer = new byte[iBUFFER_SIZE];
 		try
 		{ 
 			/* open pkzip file read-only */
-			Zip64File zf = new Zip64File(m_sPkZipFile,true);
+			Zip64File zf = new Zip64File(m_sExtZipFile,true);
 			/* extract a small file */
 			EntryInputStream eis = zf.openEntryInputStream("many/small13854.txt");
 			if (eis == null)
@@ -823,52 +946,54 @@ public class Zip64FileTester extends TestCase
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#openEntryOutputStream(java.lang.String, int, java.util.Date)}.
 	 */
+  @Test
 	public void testOpenEntryOutputStream()
 	{
+    System.out.println("testOpenEntryOutputStream");
 		/* This takes a terrible amount of space in the non-compressed case.
 		 * Therefore we delete the pkzip version first. 
 		 */
-		System.out.println("Deleting "+m_sPkZipFile);
-		File filePk = new File(m_sPkZipFile);
+		System.out.println("Deleting "+m_sExtZipFile);
+		File filePk = new File(m_sExtZipFile);
 		filePk.delete();
 		File fileTest = new File(m_sTestZipFile);
 		/* extract directory */
-		File fileExtract = new File(sEXTRACT_DIRECTORY/*SpecialFolder.getUserDataHome("Extract")*/);
+		File fileExtract = new File(sEXTRACT_DIRECTORY);
 		if (!fileExtract.exists())
 			fileExtract.mkdirs();
 		/* moderate file */
-		File fileModerate = new File(fileExtract.getAbsolutePath()+"\\moderate.txt");
+		File fileModerate = new File(fileExtract.getAbsolutePath()+File.separator+"moderate.txt");
 		if (fileModerate.exists())
 			fileModerate.delete();
 		/* medium file */
-		File fileMedium = new File(fileExtract.getAbsolutePath()+"\\medium.txt");
+		File fileMedium = new File(fileExtract.getAbsolutePath()+File.separator+"medium.txt");
 		if (fileMedium.exists())
 			fileMedium.delete();
 		/* large file */
-		File fileLarge = new File(fileExtract.getAbsolutePath()+"\\large.txt");
+		File fileLarge = new File(fileExtract.getAbsolutePath()+File.separator+"large.txt");
 		if (fileLarge.exists())
 			fileLarge.delete();
 		/* small file */
-		File fileSmall = new File(fileExtract.getAbsolutePath()+"\\many\\small12345.txt");
+		File fileSmall = new File(fileExtract.getAbsolutePath()+File.separator+"many"+File.separator+"small12345.txt");
 		if (fileSmall.exists())
 			fileSmall.delete();
 		/* temp directory */
-		File fileTemp = new File(sTEMP_DIRECTORY/*SpecialFolder.getUserDataHome("Temp")*/);
+		File fileTemp = new File(sTEMP_DIRECTORY);
 		if (!fileTemp.exists())
 			fileTemp.mkdirs();
 		/* original of moderate file */
-		File fileModerateOriginal = new File(fileTemp.getAbsolutePath()+"\\moderate.txt");
+		File fileModerateOriginal = new File(fileTemp.getAbsolutePath()+File.separator+"moderate.txt");
 		/* original of medium file */
-		File fileMediumOriginal = new File(fileTemp.getAbsolutePath()+"\\medium.txt");
+		File fileMediumOriginal = new File(fileTemp.getAbsolutePath()+File.separator+"medium.txt");
 		/* original of large file */
-		File fileLargeOriginal = new File(fileTemp.getAbsolutePath()+"\\large.txt");
+		File fileLargeOriginal = new File(fileTemp.getAbsolutePath()+File.separator+"large.txt");
 		/* original of small file */
-		File fileSmallOriginal = new File(fileTemp.getAbsolutePath()+"\\many\\small12345.txt");
+		File fileSmallOriginal = new File(fileTemp.getAbsolutePath()+File.separator+"many"+File.separator+"small12345.txt");
 		/*--- uncompressed ---------------------------------------------------------------*/
 		zipTest(FileEntry.iMETHOD_STORED);
 		/* extract the moderate file */
 		if (!extractFile("moderate.txt"))
-		  fail("pkzipc extract of uncompressed moderate.txt failed!");
+		  fail("external unzip extract of uncompressed moderate.txt failed!");
 		/* compare it to the original */
 		if (!equalTest(fileModerate,fileModerateOriginal))
 			fail("extracted compressed moderate file is not equal to its original!");
@@ -928,38 +1053,77 @@ public class Zip64FileTester extends TestCase
 		fileSmall.delete();
 	}
 
+  @Test
+  public void testWriteRead()
+  {
+    /* original of moderate file */
+    File fileModerate = new File(sTESTFILES_DIRECTORY+File.separator+"moderate.txt");
+    /* moderate zip file */
+    try
+    {
+      File fileTemp = new File(sTEMP_DIRECTORY);
+      File fileZip = new File(fileTemp.getParentFile().getAbsolutePath()+File.separator+"moderate.zip");
+      
+      Zip64File zf = new Zip64File(fileZip);
+      byte[] buf = new byte[4096];
+      
+      /* write medium file to ZIP file */
+      FileInputStream fis = new FileInputStream(fileModerate);
+      OutputStream os = zf.openEntryOutputStream("moderate", FileEntry.iMETHOD_STORED, null);
+      for (int iRead = fis.read(buf); iRead != -1; iRead = fis.read(buf))
+        os.write(buf,0,iRead);
+      os.close();
+      fis.close();
+      
+      /* read medium file from ZIP file */
+      fileModerate = new File(fileTemp.getAbsolutePath()+File.separator+"moderate.txt");
+      FileOutputStream fos = new FileOutputStream(fileModerate);
+      InputStream is = zf.openEntryInputStream("moderate");
+      for (int iRead = is.read(buf); iRead != -1; iRead = is.read(buf))
+        fos.write(buf, 0, iRead);
+      is.close();
+      fos.close();
+      
+      /* close ZIP file */
+      zf.close();
+    }
+    catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
+  }
+  
 	/**
 	 * Test method for {@link ch.enterag.utils.zip.Zip64File#delete(java.lang.String)}.
 	 */
+  @Test
 	public void testDelete()
 	{
+    System.out.println("testDelete");
 		/* extract directory */
-		File fileExtract = new File(sEXTRACT_DIRECTORY/*SpecialFolder.getUserDataHome("Extract")*/);
+		File fileExtract = new File(sEXTRACT_DIRECTORY);
 		if (!fileExtract.exists())
 			fileExtract.mkdirs();
 		/* small files */
-		File fileSmall12344 = new File(fileExtract.getAbsolutePath()+"\\many\\small12344.txt");
+		File fileSmall12344 = new File(fileExtract.getAbsolutePath()+File.separator+"many"+File.separator+"small12344.txt");
 		if (fileSmall12344.exists())
 			fileSmall12344.delete();
-		File fileSmall12345 = new File(fileExtract.getAbsolutePath()+"\\many\\small12345.txt");
+		File fileSmall12345 = new File(fileExtract.getAbsolutePath()+File.separator+"many"+File.separator+"small12345.txt");
 		if (fileSmall12345.exists())
 			fileSmall12345.delete();
-		File fileSmall12346 = new File(fileExtract.getAbsolutePath()+"\\many\\small12346.txt");
+		File fileSmall12346 = new File(fileExtract.getAbsolutePath()+File.separator+"many"+File.separator+"small12346.txt");
 		if (fileSmall12346.exists())
 			fileSmall12346.delete();
 		/* temp directory */
-		File fileTemp = new File(sTEMP_DIRECTORY/*SpecialFolder.getUserDataHome("Temp")*/);
+		File fileTemp = new File(sTEMP_DIRECTORY);
 		if (!fileTemp.exists())
 			fileTemp.mkdirs();
 		/* original of small files */
-		File fileSmall12344Original = new File(fileTemp.getAbsolutePath()+"\\many\\small12344.txt");
-		File fileSmall12346Original = new File(fileTemp.getAbsolutePath()+"\\many\\small12346.txt");
+		File fileSmall12344Original = new File(fileTemp.getAbsolutePath()+File.separator+"many"+File.separator+"small12344.txt");
+		File fileSmall12346Original = new File(fileTemp.getAbsolutePath()+File.separator+"many"+File.separator+"small12346.txt");
 		/* zip everything to new non-existent file */
 		zipTest(FileEntry.iMETHOD_DEFLATED);
 		/* open it read/write and delete the medium file */
 		try
 		{
-			Zip64File zf = new Zip64File(m_sTestZipFile);
+      Zip64File zf = new Zip64File(m_sTestZipFile);
 			zf.delete("many/small12345.txt");
 			FileEntry nonExistentDel = zf.delete("non-existent");
 			zf.close();
