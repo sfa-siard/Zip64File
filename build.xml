@@ -242,6 +242,7 @@ Created    : 16.04.2010, Hartwig Thomas
       </classpath>
     </javac>
     <!-- run the tests -->
+  	<echo message="test ${classzip64tester}"/>
     <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
       <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
       <formatter type="plain"/>
@@ -257,6 +258,7 @@ Created    : 16.04.2010, Hartwig Thomas
         todir="${dirtmp}"/>
     </junit>
     <sleep milliseconds="10"/> 
+  	<echo message="test ${classeistester}"/>
     <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
       <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
       <formatter type="plain"/>
@@ -271,6 +273,7 @@ Created    : 16.04.2010, Hartwig Thomas
       outfile="${fileeistest}"
         todir="${dirtmp}"/>
     </junit>
+  	<echo message="test ${classeostester}"/>
     <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
       <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
       <formatter type="plain"/>
