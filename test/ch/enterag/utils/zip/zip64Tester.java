@@ -466,9 +466,15 @@ public class zip64Tester
         /* file date/time */
         iPosition = sOutput.indexOf(": ");
         sOutput = sOutput.substring(iPosition+2);
-        /* 2 seconds is maximum resolution of DOS date / ceil seems to be what PKZIP does */ 
-        String sFileDate = DATE_FORMAT.format(new Date(2000*(long)Math.ceil(fileEntry.lastModified()/2000.0)));
-        if (!sOutput.startsWith(sFileDate))
+        /* 2 seconds is maximum resolution of DOS date */
+        boolean bDateIncorrect = true;
+        for (long lTime = 2000*(long)Math.floor(fileEntry.lastModified()/2000.0); bDateIncorrect && (lTime <= 2000*(long)Math.ceil(fileEntry.lastModified()/2000.0)); lTime = lTime + 1L)
+        {
+          String sFileDate = DATE_FORMAT.format(new Date());
+          if (!sOutput.startsWith(sFileDate))
+            bDateIncorrect = false;
+        }
+        if (bDateIncorrect)
           fail("Date of " + sEntry + " incorrect!");
         /* size */
         iPosition = sOutput.indexOf(": ");
