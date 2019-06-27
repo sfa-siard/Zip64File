@@ -468,9 +468,10 @@ public class zip64Tester
         sOutput = sOutput.substring(iPosition+2);
         /* 2 seconds is maximum resolution of DOS date */
         boolean bDateIncorrect = true;
-        for (long lTime = 2000*(long)Math.floor(fileEntry.lastModified()/2000.0); bDateIncorrect && (lTime <= 2000*(long)Math.ceil(fileEntry.lastModified()/2000.0)); lTime = lTime + 1L)
+        double dLastModifiedSec = fileEntry.lastModified()/1000.0;
+        for (long lTime = (long)Math.floor(dLastModifiedSec-2.0); bDateIncorrect && (lTime <= (long)Math.ceil(dLastModifiedSec+2.0)); lTime = lTime + 1L)
         {
-          String sFileDate = DATE_FORMAT.format(new Date());
+          String sFileDate = DATE_FORMAT.format(new Date(1000*lTime));
           if (!sOutput.startsWith(sFileDate))
             bDateIncorrect = false;
         }
