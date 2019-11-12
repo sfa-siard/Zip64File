@@ -3,7 +3,7 @@ Created-By: Hartwig Thomas, Enter AG, Zurich, Switzerland
 Specification-Title: ZIP64
 Specification-Version: 1.0
 Implementation-Title: Zip64
-Implementation-Version: 2.1.71
+Implementation-Version: 2.1.72
 Implementation-Vendor: Enter AG, Rüti ZH, Switzerland
 Built-Date: 12. Nov 2019
 Main-Class: ch.enterag.zip.zip64
