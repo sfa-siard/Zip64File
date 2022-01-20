@@ -9,10 +9,8 @@ writing ZIP files in ZIP 64 format.
 
 ## Getting started (for devs)
 
-For building the binaries, Java JDK (1.8 or higher), Ant, and Git must
-have been installed. A copy of build.properties.template must be called
-build.properties. In it using a text editor the local values must be
-entered as directed by the comments.
+For building the binaries, Java JDK (1.8 or higher) and Ant must
+have been installed. Adjust `build.properties` according to your needs (if needed).
 
 Run all tests:
 
@@ -26,13 +24,12 @@ Build and deploy:
 ant deploy
 ```
 
-More information about the build process can be found in
-[./doc/manual/developer/build.html](./doc/manual/developer/build.html).
-
-You may use an IDE of your choice for development (tested with intellij idea and eclipse)
-
 ## Documentation
 
 [./doc/manual/user/index.html](./doc/manual/user/index.html) contains the manual for using the binaries.
 [./doc/manual/developer/index.html](./doc/manual/user/index.html) is the manual for developers wishing
 build the binaries or work on the code.
+
+
+More information about the build process can be found in
+[./doc/manual/developer/build.html](./doc/manual/developer/build.html).
