@@ -113,26 +113,6 @@ Created    : 16.04.2010, Hartwig Thomas
     <echo message="branch.master: ${branch.master}"/>
     <echo message="build.properties.configured: ${build.properties.configured}"/>
   </target>
-	
-  <!-- commit local work -->
-  <property name="fileadd" value="${dirtmp}/add.txt"/>
-  <property name="filecommit" value="${dirtmp}/commit.txt"/>
-  <target name="commit" depends="check" if="git">
-  	<echo message="get recent SIARD JARs"/>
-    <!-- TODO: get most recently released version of enterutils.jar -->
-    <copy file="../EnterUtilities/dist/enterutils.jar" todir="${dirlib}" failonerror="false"/>
-    <echo message="${ant.project.name}: git add -A"/>
-    <exec executable="${git}" output="${fileadd}" failonerror="true">
-      <arg value="add"/>
-      <arg value="-A"/>
-    </exec>
-    <echo message="${ant.project.name}: git commit -am &quot;${version}.${revold}&quot;"/>
-    <exec executable="${git}" output="${filecommit}">
-      <arg value="commit"/>
-      <arg value="-am" />
-      <arg value="${version}.${revold}" />
-    </exec>
-  </target>
   
   <!-- increment revision and update manifests -->
   <property name="filerevisionproperties" value="${dirtmp}/revision.properties"/>
