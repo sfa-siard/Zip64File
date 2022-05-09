@@ -113,50 +113,10 @@ Created    : 16.04.2010, Hartwig Thomas
     <echo message="branch.master: ${branch.master}"/>
     <echo message="build.properties.configured: ${build.properties.configured}"/>
   </target>
-	
-  <!-- commit local work -->
-  <property name="fileadd" value="${dirtmp}/add.txt"/>
-  <property name="filecommit" value="${dirtmp}/commit.txt"/>
-  <target name="commit" depends="check" if="git">
-  	<echo message="get recent SIARD JARs"/>
-    <!-- TODO: get most recently released version of enterutils.jar -->
-    <copy file="../EnterUtilities/dist/enterutils.jar" todir="${dirlib}" failonerror="false"/>
-    <echo message="${ant.project.name}: git add -A"/>
-    <exec executable="${git}" output="${fileadd}" failonerror="true">
-      <arg value="add"/>
-      <arg value="-A"/>
-    </exec>
-    <echo message="${ant.project.name}: git commit -am &quot;${version}.${revold}&quot;"/>
-    <exec executable="${git}" output="${filecommit}">
-      <arg value="commit"/>
-      <arg value="-am" />
-      <arg value="${version}.${revold}" />
-    </exec>
-  </target>
-  
-  <!-- update from remote master -->
-  <property name="filepull" value="${dirtmp}/pull.txt"/>
-  <target name="pull" depends="commit" if="git">
-    <!-- pull master branch
-    <echo message="${ant.project.name}: git pull origin master"/>
-    <exec executable="${git}" output="${filepull}">
-      <arg value="pull"/>
-      <arg value="origin"/>
-      <arg value="master"/>
-    </exec>
-    -->
-    <!-- pull dev branch -->
-    <echo message="${ant.project.name}: git pull origin ${branch}"/>
-    <exec executable="${git}" output="${filepull}" failonerror="true">
-      <arg value="pull"/>
-      <arg value="origin"/>
-      <arg value="${branch}"/>
-    </exec>
-  </target>
   
   <!-- increment revision and update manifests -->
   <property name="filerevisionproperties" value="${dirtmp}/revision.properties"/>
-  <target name="revision" depends="pull">
+  <target name="revision" depends="check">
     <echo message="${ant.project.name}: revision"/>
     <copy file="${filerevoldproperties}" tofile="${filerevisionproperties}" overwrite="true"/>
     <replaceregexp file="${filerevisionproperties}" 
@@ -343,28 +303,9 @@ Created    : 16.04.2010, Hartwig Thomas
       </zipfileset>
    	</zip>
   </target>
-	
-  <!-- push to remote dev branch -->
-  <property name="filepush" value="${dirtmp}/push.txt"/>
-  <target name="push" depends="zip" if="git" unless="branch.master">
-    <!-- commit -->
-    <echo message="${ant.project.name}: git commit -am &quot;Build: ${version}.${revision}&quot;"/>
-    <exec executable="${git}" output="${filecommit}" failonerror="true">
-      <arg value="commit"/>
-      <arg value="-am" />
-      <arg value="Build: ${version}.${revision}" />
-    </exec>
-    <!-- push to remote -->
-    <echo message="${ant.project.name}: git push origin ${branch}"/>
-    <exec executable="${git}" output="${filepush}" failonerror="true">
-      <arg value="push"/>
-      <arg value="origin"/>
-      <arg value="${branch}"/>
-    </exec>
-  </target>
   
   <!-- deploy to file system -->
-  <target name="deploy" depends="push" if="dirdeploy">
+  <target name="deploy" if="dirdeploy">
     <echo message="${ant.project.name}: deploy"/>
     <delete dir="${dirdeploy}/${ant.project.name}"/>
     <unzip dest="${dirdeploy}" src="${dirdist}/${ant.project.name}-${version}.${revision}.zip" />
