@@ -139,7 +139,7 @@ Created    : 16.04.2010, Hartwig Thomas
   </target>
   
   <!-- build the Zip64File classes -->
-  <target name="build" depends="init,revision">
+  <target name="build" depends="init">
     <echo message="${ant.project.name}: build"/>
     <!-- without this, the package-info class is not generated! -->
     <touch>
@@ -156,10 +156,22 @@ Created    : 16.04.2010, Hartwig Thomas
       destdir="${dirbuildclasses}">
     </javac>
   </target>
+
+  <!-- create the JAR file for tests without new revision-->
+  <property name="jarfile" value="${ant.project.name}.jar"/>
+  <target name="jar-test" depends="build,revision">
+    <echo message="${ant.project.name}: jar"/>
+    <jar jarfile="${dirdist}/${jarfile}" manifest="${filemanifest}">
+      <fileset dir="${dirbuildclasses}">
+        <include name="**/*.class"/>
+        <include name="**/res/*.*"/>
+      </fileset>
+    </jar>
+  </target>
   
   <!-- create the JAR file containing all classes -->
   <property name="jarfile" value="${ant.project.name}.jar"/>
-  <target name="jar" depends="build">
+  <target name="jar" depends="revision,javadoc">
     <echo message="${ant.project.name}: jar"/>
     <jar jarfile="${dirdist}/${jarfile}"
        manifest="${filemanifest}">
@@ -183,7 +195,7 @@ Created    : 16.04.2010, Hartwig Thomas
 	<property name="fileeistest" value="eis-test"/>
 	<property name="classeostester" value="ch.enterag.utils.zip.EntryOutputStreamTester"/>
 	<property name="fileeostest" value="eos-test"/>
-  <target name="test" depends="jar" if="run.tests">
+  <target name="test" depends="jar-test" if="run.tests">
     <echo message="${ant.project.name}: test ${cpenterutils};${dirdist}/${jarfile};${cpjunit}"/>
     <!-- build the tests -->
     <javac debug="true" debuglevel="${debuglevel}"
@@ -275,7 +287,7 @@ Created    : 16.04.2010, Hartwig Thomas
       version="true"/>
   </target>
   
-  <target name="zip" depends="javadoc">
+  <target name="release" depends="jar">
     <echo message="${ant.project.name}: zip"/>
     <zip zipfile="${dirdist}/${ant.project.name}-${version}.${revision}.zip">
       <zipfileset dir="${dirdist}" prefix="${ant.project.name}/${dirlib}">

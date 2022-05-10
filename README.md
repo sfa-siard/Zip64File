@@ -18,10 +18,10 @@ Run all tests:
 ant test
 ```
 
-Build and deploy:
+Create a release
 
 ```shell
-ant deploy
+ant release
 ```
 
 ## Documentation
