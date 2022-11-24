@@ -63,7 +63,7 @@ Created    : 16.04.2010, Hartwig Thomas
   <property name="filerevoldproperties" value="${dirtmp}/revold.properties"/>
   <property name="filegithead" value=".git/HEAD"/>
   <property name="filebranchproperties" value="${dirtmp}/branch.properties"/>
-  <target name="check">
+  <target name="check" depends="copy-dependencies">
     <!-- get current date -->
     <tstamp>
       <format property="builtdate" pattern="dd. MMM yyyy" locale="en,CH"/>
@@ -322,6 +322,11 @@ Created    : 16.04.2010, Hartwig Thomas
     <delete dir="${dirdeploy}/${ant.project.name}"/>
     <unzip dest="${dirdeploy}" src="${dirdist}/${ant.project.name}-${version}.${revision}.zip" />
   	<chmod dir="${dirdeploy}" perm="ugo+rx" includes="**/*.sh"/>
+  </target>
+
+  <target name="copy-dependencies" depends="init">
+    <echo message="Copy jar files from dependency projects on local file system"/>
+    <copy file="../EnterUtilities/dist/enterutils.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
   </target>
   
 </project>
