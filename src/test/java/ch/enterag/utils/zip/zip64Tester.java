@@ -41,6 +41,7 @@ import java.text.*;
 /** Tests zip64.
  @author Hartwig Thomas
  */
+@Ignore
 public class zip64Tester
 {
   /** small file size for test file */

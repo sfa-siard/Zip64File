@@ -40,7 +40,7 @@ public class EntryOutputStreamTester
   /** zip file */
   private String m_sZipFile = null;
   /** test files directory */
-  private final static String sTESTFILES_DIRECTORY = "testfiles";
+  private final static String sTESTFILES_DIRECTORY = "src/test/resources";
   /** temp directory */
   private final static String sTEMP_DIRECTORY = "tmp";
 

@@ -1,35 +1,27 @@
-# Zip64File - ZIP 64 handler for SIARD 2.1
+# Zip64File - SIARD ZIP 64 handler
 
-This package contains a ZIP 64 handler.
-Its main intention reading and writing ZIP files which conform to the 
-64 bit extension of the ZIP standard.
+This package contains a ZIP 64 handler. Its main purpose is reading and writing ZIP files which conform to the 64 bit extension of the ZIP standard. It also includes a command-line tool for reading and writing ZIP files in ZIP 64 format.
 
-It also includes a command-line tool for reading and
-writing ZIP files in ZIP 64 format.
+## Prerequisites
 
-## Getting started (for devs)
+For building the binaries, Java JDK (1.8 or higher) must be installed. 
 
-For building the binaries, Java JDK (1.8 or higher) and Ant must
-have been installed. Adjust `build.properties` according to your needs (if needed).
-
-Run all tests:
-
+### Run all tests
 ```shell
-ant test
+./gradlew check
 ```
 
-Create a release
-
+### Build the project
 ```shell
-ant release
+./gradlew clean build
+```
+
+### Create a release
+This creates a new tag and pushes the tag to main branch.
+```shell
+./gradlew release
 ```
 
 ## Documentation
-
-[./doc/manual/user/index.html](./doc/manual/user/index.html) contains the manual for using the binaries.
-[./doc/manual/developer/index.html](./doc/manual/user/index.html) is the manual for developers wishing
-build the binaries or work on the code.
-
-
-More information about the build process can be found in
-[./doc/manual/developer/build.html](./doc/manual/developer/build.html).
+- [User's Manual](./doc/manual/user/index.html)
+- [Developer's Manual](./doc/manual/developer/index.html)

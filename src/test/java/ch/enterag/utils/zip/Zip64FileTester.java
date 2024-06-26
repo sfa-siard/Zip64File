@@ -42,7 +42,7 @@ public class Zip64FileTester
 	/** test zip file */
 	private String m_sTestZipFile = null;
 	/** test files directory */
-	private final static String sTESTFILES_DIRECTORY = "testfiles";
+	private final static String sTESTFILES_DIRECTORY = "src/test/resources";
   /** temp location with lots of free space which does not need to be backuped */
   private final static String sTEMP_LOCATION = "tmp";
   /** temp directory */
@@ -789,7 +789,7 @@ public class Zip64FileTester
 		/* open external file read-only */
 		try
 		{ 
-			Zip64File zf = new Zip64File("..\\SiardApi\\testfiles\\sql1999.siard",true);
+			Zip64File zf = new Zip64File("src/test/resources/sql1999.siard", true);
 			/* get the file entries */
 			List<FileEntry> listFileEntries = zf.getListFileEntries();
 			for (Iterator<FileEntry> iterFileEntry = listFileEntries.iterator(); iterFileEntry.hasNext(); )

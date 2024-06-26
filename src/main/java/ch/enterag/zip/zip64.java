@@ -783,7 +783,7 @@ public class zip64
    */
   public static void main(String[] args)
   {
-    zip64 z64 = new zip64(Arguments.newInstance(args));
+    zip64 z64 = new zip64(Arguments.getInstance(args));
     System.exit(z64.m_iReturn);
   } /* main */
 
