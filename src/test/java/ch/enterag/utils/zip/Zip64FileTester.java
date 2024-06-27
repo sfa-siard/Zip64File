@@ -18,8 +18,8 @@ import java.util.zip.*;
 import ch.enterag.utils.*;
 import ch.enterag.utils.lang.*;
 
-import static org.junit.Assert.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /*====================================================================*/
 /** Tests Zip64File.
@@ -505,7 +505,7 @@ public class Zip64FileTester
 	  fos.close();
 	} /* createLarge */
 	
-	@BeforeClass
+	@BeforeAll
 	public static void setupClass()
 	{
     try
@@ -555,7 +555,7 @@ public class Zip64FileTester
 	/* (non-Javadoc)
 	 @see junit.framework.TestCase#setUp()
 	 */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception
 	{
     File fileTemp = new File(sTEMP_DIRECTORY);
@@ -583,7 +583,7 @@ public class Zip64FileTester
 	/* (non-Javadoc)
 	 @see junit.framework.TestCase#tearDown()
 	 */
-  @After
+  @AfterEach
   public void tearDown() throws Exception
 	{
 	}

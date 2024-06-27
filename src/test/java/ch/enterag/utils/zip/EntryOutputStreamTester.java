@@ -26,8 +26,8 @@ it is possible to negotiate a different license with the copyright holder.
 package ch.enterag.utils.zip;
 
 import java.io.*;
-import static org.junit.Assert.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /*====================================================================*/
 /** Tests EntryOutputStream.
@@ -48,7 +48,7 @@ public class EntryOutputStreamTester
   /* (non-Javadoc)
    @see junit.framework.TestCase#setUp()
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception
   {
     /* create a file of moderate length in Temp and zip it */
@@ -64,7 +64,7 @@ public class EntryOutputStreamTester
   /* (non-Javadoc)
    @see junit.framework.TestCase#tearDown()
    */
-  @After
+  @AfterEach
   public void tearDown() throws Exception
   {
   } /* tearDown */
