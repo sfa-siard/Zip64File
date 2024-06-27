@@ -25,3 +25,7 @@ This creates a new tag and pushes the tag to main branch.
 ## Documentation
 - [User's Manual](./doc/manual/user/index.html)
 - [Developer's Manual](./doc/manual/developer/index.html)
+
+## Declaration
+Contributions to the codebase have been made with the support of Codeium. Codeium is AI-powered code completion tool, that is trained exclusively on natural language and source code data with [permissive licenses](https://codeium.com/blog/copilot-trains-on-gpl-codeium-does-not ). 
+
