@@ -32,7 +32,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
       - name: Execute Gradle build
         run: |
-          if [ "${{ github.event.inputs.runTests }}" == 'true' ]; then
-          ./gradlew build
+          if [[ "${{ github.event.inputs.runTests }}" == 'true' ]]; then
+            ./gradlew build
           else
-          ./gradlew build -x test
+            ./gradlew build -x test
+          fi
