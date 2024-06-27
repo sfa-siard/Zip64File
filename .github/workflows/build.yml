@@ -6,7 +6,16 @@ on:
       - main
   pull_request:
     branches: [ main ]
-
+  workflow_dispatch:
+    inputs:
+      runTests:
+        description: 'Run tests'
+        required: true
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
 jobs:
   build:
 
@@ -22,4 +31,8 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Execute Gradle build
-        run: ./gradlew build
+        run:
+          if ${{ github.event.inputs.runTests == 'true' }} ; then
+          ./gradlew build
+          else
+          ./gradlew build -x test
