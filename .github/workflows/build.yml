@@ -23,7 +23,7 @@ on:
         type: choice
         options:
           - 'debug'
-          - 'info'
+          - 'info'              
 jobs:
   build:
 
