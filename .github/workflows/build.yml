@@ -16,6 +16,14 @@ on:
         options:
           - 'true'
           - 'false'
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'info'
+        type: choice
+        options:
+          - 'debug'
+          - 'info'
 jobs:
   build:
 
