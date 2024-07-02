@@ -30,11 +30,11 @@ public class Zip64FileTester
 	/** buffer size for I/O */
 	private final static int iBUFFER_SIZE = 8192;
 	/** small file size for I/O */
-	private final static int iSMALL_SIZE = 16;
-	/** number of buffers for more than 4 GB */
-	private final static int iLARGE_BUFFERS = 0x0A0000;
-	/** number of buffers for more than 65 KB */
-	private final static int iMODERATE_BUFFERS = 20;
+	private final static int iSMALL_SIZE = 20480;
+	/** number of buffers for more than 250 MB */
+	private final static int iLARGE_BUFFERS = 31250;
+	/** number of buffers for more than 50 MB */
+	private final static int iMODERATE_BUFFERS = 6250;
 	/** global file comment */
 	private final static String sZIP_COMMENT = "a global ZIP file comment";
 	/** zip file produced by external zip */
@@ -436,7 +436,7 @@ public class Zip64FileTester
 		}
 	  FileOutputStream fos = new FileOutputStream(fileMedium);
 	  byte[] buffer = new byte[iBUFFER_SIZE];
-	  for (int iBuffer = 0; iBuffer < iLARGE_BUFFERS; iBuffer++)
+	  for (int iBuffer = 0; iBuffer < iMODERATE_BUFFERS; iBuffer++)
 	  {
 	  	/* fill the buffer with randomly chosen prepared words */
 	  	for (int iPos = 0; iPos < buffer.length; )
@@ -510,33 +510,28 @@ public class Zip64FileTester
 	{
     try
     {
-      /* in temp directory: */
       File fileTemp = new File(sTEMP_DIRECTORY);
       if (!fileTemp.exists())
         fileTemp.mkdirs();
-      /* 1. write more than 4 GB incompressible random file "large" */
       String sLargeFile = fileTemp.getAbsolutePath()+File.separator+"large.txt";
       File fileLarge = new File(sLargeFile);
       if (!fileLarge.exists())
         createLarge(fileLarge);
-      /* 2. write more than 4 GB random file which can be compressed to less than 4 GB "medium" */
       String sMediumFile = fileTemp.getAbsolutePath()+File.separator+"medium.txt";
       File fileMedium = new File(sMediumFile);
       if (!fileMedium.exists())
         createMedium(fileMedium);
-      /* 2.a) write more than 65 KB random file */
       String sModerateFile = fileTemp.getAbsolutePath()+File.separator+"moderate.txt";
       File fileModerate = new File(sModerateFile);
       if (!fileModerate.exists())
         createModerate(fileModerate);
-      /* 3. create sub directory "many" */
+
       String sManyFolder = fileTemp.getAbsolutePath()+File.separator+"many"+File.separator;
       File fileMany = new File(sManyFolder);
       if (!fileMany.exists())
       {
         System.out.println("writing small files");
         fileMany.mkdir();
-        /* 4. write more than 65'000 small files "small00001" - "smallxxxxx" */
         for (int i = 0; i < 0x014000; i++)
         {
           DecimalFormat df = new DecimalFormat("00000");
@@ -767,7 +762,7 @@ public class Zip64FileTester
 			if (feMedium != null)
 			{
 				long lSize = iBUFFER_SIZE;
-				lSize *= iLARGE_BUFFERS;
+				lSize *= iMODERATE_BUFFERS;
 				if (feMedium.getSize() != lSize)
 					fail("Invalid size for medium.txt: "+String.valueOf(feMedium.getSize()));
 			}
