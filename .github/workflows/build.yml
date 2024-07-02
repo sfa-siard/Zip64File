@@ -11,7 +11,7 @@ on:
       runTests:
         description: 'Run tests'
         required: true
-        default: 'false'
+        default: 'true'
         type: choice
         options:
           - 'true'
