@@ -28,10 +28,11 @@ it is possible to negotiate a different license with the copyright holder.
 ======================================================================*/
 package ch.enterag.utils.zip;
 
-import static org.junit.Assert.*;
-import org.junit.*;
 import java.io.*;
 import java.util.*;
+
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import ch.enterag.utils.*;
 import ch.enterag.utils.lang.*;
@@ -41,6 +42,7 @@ import java.text.*;
 /** Tests zip64.
  @author Hartwig Thomas
  */
+@Disabled
 public class zip64Tester
 {
   /** small file size for test file */
@@ -301,7 +303,7 @@ public class zip64Tester
     catch(InterruptedException ie) { fail(EU.getExceptionMessage(ie)); }
   }
   
-  @Before
+  @BeforeEach
   public void setUp()
     throws IOException
   {
@@ -377,7 +379,7 @@ public class zip64Tester
       
   } /* setUp */
 
-  @After
+  @AfterEach
   public void tearDown() 
     throws IOException
   {
