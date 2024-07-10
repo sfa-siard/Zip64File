@@ -1,3 +1,6 @@
+import java.text.DateFormat
+import java.util.*
+
 plugins {
     `java-library`
     id("pl.allegro.tech.build.axion-release") version "1.14.3"
@@ -24,5 +27,19 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.withType(Jar::class) {
+    manifest {
+        attributes["Manifest-Version"] = "1.0"
+        attributes["Created-By"] = "Hartwig Thomas, Enter AG, Rüti ZH, Switzerland; Puzzle ITC GmbH, Switzerland"
+        attributes["Specification-Title"] = "ZIP64"
+        attributes["Specification-Vendor"] = "Swiss Federal Archives, Berne, Switzerland"
+        attributes["Implementation-Title"] = "Zip64"
+        attributes["Implementation-Version"] = archiveVersion
+        attributes["Implementation-Vendor"] = "Swiss Federal Archives, Berne, Switzerland"
+        attributes["Built-Date"] = DateFormat.getDateInstance().format(Date())
+
+    }
 }
 
