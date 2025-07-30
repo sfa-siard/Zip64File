@@ -1130,9 +1130,9 @@ public class Zip64File
   	if (m_feLocal != null)
   	{
 	  	/* write remaining bytes - if any */
-	  	if ((m_lSize > 0) && (m_feLocal.getMethod() == FileEntry.iMETHOD_DEFLATED))
+	  	if (m_feLocal.getMethod() == FileEntry.iMETHOD_DEFLATED)
 	  	{
-		  	m_def.finish();
+	  		m_def.finish();
 				byte[] bufCompressed = new byte[iBUFFER_SIZE];
 		  	while (!m_def.finished())
 		  	{
