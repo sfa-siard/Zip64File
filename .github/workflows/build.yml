@@ -43,5 +43,5 @@ jobs:
           if [ "${{ github.event.inputs.runTests }}" = "false" ]; then
             ./gradlew build -x test
           else
-            ./gradlew build
+            ./gradlew build --info
           fi
