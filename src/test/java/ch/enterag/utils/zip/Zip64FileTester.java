@@ -139,14 +139,13 @@ public class Zip64FileTester
 				File fileSmallSource = new File(fileTemp.getAbsolutePath()+File.separator+"many"+File.separator+sSmallFile);
         if ((iSmall % 10000) == 0)
           System.out.println("add "+fileSmallSource.getAbsolutePath());
-				appendFile(zf,"many/"+sSmallFile,fileSmallSource,iMethod);
+		appendFile(zf,"many/"+sSmallFile,fileSmallSource,iMethod);
 			}
 			/* write the central directory */
 			zf.close();
 			sw.stop();
       System.out.println("Closed "+m_sTestZipFile+" after "+sw.formatMs()+" ms");
 		}
-		catch(FileNotFoundException fnfe) { fail(fnfe.getClass().getName()+": "+fnfe.getMessage());}
 		catch(IOException ie) { fail(ie.getClass().getName()+": "+ie.getMessage());}
 	} /* zipTest */
 
@@ -274,10 +273,6 @@ public class Zip64FileTester
 		boolean bExtracted = false;
 		/* temp directory */
 		File fileExtract = new File(sEXTRACT_DIRECTORY);
-		if (!fileExtract.exists())
-			fileExtract.mkdirs();
-		if (fileExtract.exists())
-		  fileExtract.delete();
 		if (_sPkZipC != null)
 		  bExtracted = unzipPkZip(sEntryName,fileExtract);
 		else if (_sUnzip60 != null)
@@ -551,28 +546,35 @@ public class Zip64FileTester
 	 @see junit.framework.TestCase#setUp()
 	 */
   @BeforeEach
-  public void setUp() throws Exception
-	{
-    File fileTemp = new File(sTEMP_DIRECTORY);
-    /* 5. zip everything using external executable */
-    File fileZip = new File(fileTemp.getParentFile().getAbsolutePath()+File.separator+"exttest.zip");
-//    if (fileZip.exists())
-//      fileZip.delete();
-    if (!fileZip.exists())
-    {
+  public void setUp() throws Exception {
+    File tempDir = new File(sTEMP_DIRECTORY);
+    File extractDir = new File(sEXTRACT_DIRECTORY);
+    tempDir.mkdirs();
+    extractDir.mkdirs();
+    
+    File externalZipFile = new File(tempDir.getParent(), "exttest.zip");
+    if (!externalZipFile.exists()) {
       System.out.println("zipping everything");
-      if (_sPkZipC != null)
-        zipPkZip(fileTemp, fileZip);
-      else if (_sZip30 != null)
-        zipInfoZip(fileTemp, fileZip);
-      m_sExtZipFile = fileZip.getAbsolutePath();
+      if (_sPkZipC != null) {
+        zipPkZip(tempDir, externalZipFile);
+      } else if (_sZip30 != null) {
+        zipInfoZip(tempDir, externalZipFile);
+      }
     }
-		/* 0. delete all zip files created below */
-		File fileTest = new File(fileTemp.getParentFile().getAbsolutePath()+File.separator+"test.zip");
-		if (fileTest.exists())
-			fileTest.delete();
-		m_sTestZipFile = fileTest.getAbsolutePath();
-	} /* setUp */
+    m_sExtZipFile = externalZipFile.getAbsolutePath();
+    
+    File testZipFile = new File(tempDir.getParent(), "test.zip");
+    File moderateZipFile = new File(tempDir.getParent(), "moderate.zip");
+    
+    if (testZipFile.exists()) {
+      testZipFile.delete();
+    }
+    if (moderateZipFile.exists()) {
+      moderateZipFile.delete();
+    }
+    
+    m_sTestZipFile = testZipFile.getAbsolutePath();
+  }
 
 	/*------------------------------------------------------------------*/
 	/* (non-Javadoc)
@@ -847,25 +849,15 @@ public class Zip64FileTester
 	{
     System.out.println("testOpenEntryInputStream");
 		/* extract directory */
-		File fileExtract = new File(sEXTRACT_DIRECTORY/*SpecialFolder.getUserDataHome("Extract")*/);
-		if (!fileExtract.exists())
-			fileExtract.mkdirs();
+		File fileExtract = new File(sEXTRACT_DIRECTORY);
 		/* large file */
 		File fileLarge = new File(fileExtract.getAbsolutePath()+File.separator+"large.txt");
-		if (fileLarge.exists())
-			fileLarge.delete();
 		/* medium file */
 		File fileMedium = new File(fileExtract.getAbsolutePath()+File.separator+"medium.txt");
-		if (fileMedium.exists())
-			fileMedium.delete();
 		/* small file */
 		File fileSmall = new File(fileExtract.getAbsolutePath()+File.separator+"small.txt");
-		if (fileSmall.exists())
-			fileSmall.delete();
 		/* temp directory */
-		File fileTemp = new File(sTEMP_DIRECTORY/*SpecialFolder.getUserDataHome("Temp")*/);
-		if (!fileTemp.exists())
-			fileTemp.mkdirs();
+		File fileTemp = new File(sTEMP_DIRECTORY);
 		/* original of large file */
 		File fileLargeOriginal = new File(fileTemp.getAbsolutePath()+File.separator+"large.txt");
 		/* original of medium file */
@@ -954,28 +946,16 @@ public class Zip64FileTester
 		File fileTest = new File(m_sTestZipFile);
 		/* extract directory */
 		File fileExtract = new File(sEXTRACT_DIRECTORY);
-		if (!fileExtract.exists())
-			fileExtract.mkdirs();
 		/* moderate file */
 		File fileModerate = new File(fileExtract.getAbsolutePath()+File.separator+"moderate.txt");
-		if (fileModerate.exists())
-			fileModerate.delete();
 		/* medium file */
 		File fileMedium = new File(fileExtract.getAbsolutePath()+File.separator+"medium.txt");
-		if (fileMedium.exists())
-			fileMedium.delete();
 		/* large file */
 		File fileLarge = new File(fileExtract.getAbsolutePath()+File.separator+"large.txt");
-		if (fileLarge.exists())
-			fileLarge.delete();
 		/* small file */
 		File fileSmall = new File(fileExtract.getAbsolutePath()+File.separator+"many"+File.separator+"small12345.txt");
-		if (fileSmall.exists())
-			fileSmall.delete();
 		/* temp directory */
 		File fileTemp = new File(sTEMP_DIRECTORY);
-		if (!fileTemp.exists())
-			fileTemp.mkdirs();
 		/* original of moderate file */
 		File fileModerateOriginal = new File(fileTemp.getAbsolutePath()+File.separator+"moderate.txt");
 		/* original of medium file */
@@ -1058,7 +1038,7 @@ public class Zip64FileTester
     {
       File fileTemp = new File(sTEMP_DIRECTORY);
       File fileZip = new File(fileTemp.getParentFile().getAbsolutePath()+File.separator+"moderate.zip");
-      
+
       Zip64File zf = new Zip64File(fileZip);
       byte[] buf = new byte[4096];
       
@@ -1094,22 +1074,12 @@ public class Zip64FileTester
     System.out.println("testDelete");
 		/* extract directory */
 		File fileExtract = new File(sEXTRACT_DIRECTORY);
-		if (!fileExtract.exists())
-			fileExtract.mkdirs();
 		/* small files */
 		File fileSmall12344 = new File(fileExtract.getAbsolutePath()+File.separator+"many"+File.separator+"small12344.txt");
-		if (fileSmall12344.exists())
-			fileSmall12344.delete();
 		File fileSmall12345 = new File(fileExtract.getAbsolutePath()+File.separator+"many"+File.separator+"small12345.txt");
-		if (fileSmall12345.exists())
-			fileSmall12345.delete();
 		File fileSmall12346 = new File(fileExtract.getAbsolutePath()+File.separator+"many"+File.separator+"small12346.txt");
-		if (fileSmall12346.exists())
-			fileSmall12346.delete();
 		/* temp directory */
 		File fileTemp = new File(sTEMP_DIRECTORY);
-		if (!fileTemp.exists())
-			fileTemp.mkdirs();
 		/* original of small files */
 		File fileSmall12344Original = new File(fileTemp.getAbsolutePath()+File.separator+"many"+File.separator+"small12344.txt");
 		File fileSmall12346Original = new File(fileTemp.getAbsolutePath()+File.separator+"many"+File.separator+"small12346.txt");
