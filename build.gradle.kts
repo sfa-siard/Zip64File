@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-    implementation("ch.admin.bar:enterutilities:v2.2.3")
+    implementation("ch.admin.bar:enterutilities:v2.2.4")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.1")
 }
