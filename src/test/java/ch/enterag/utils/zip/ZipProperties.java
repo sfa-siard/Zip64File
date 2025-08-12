@@ -41,7 +41,7 @@ public class ZipProperties extends Properties {
 
 
     private void readProperties() throws IOException {
-        Reader rdr = new FileReader("gradle.properties");
+        Reader rdr = new FileReader("test.properties");
         load(rdr);
         rdr.close();
     }
