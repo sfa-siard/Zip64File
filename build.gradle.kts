@@ -11,8 +11,9 @@ group = "ch.admin.bar"
 version = scmVersion.version
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
 repositories {
@@ -20,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    implementation("ch.admin.bar:enterutilities:v2.2.4")
+    implementation("ch.admin.bar:enterutilities:v2.2.5")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.1")
 }
