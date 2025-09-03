@@ -1,10 +1,8 @@
-# Zip64File - SIARD ZIP 64 handler
-
+# Zip64File - SIARD 2.2 ZIP 64 handler
 This package contains a ZIP 64 handler. Its main purpose is reading and writing ZIP files which conform to the 64 bit extension of the ZIP standard. It also includes a command-line tool for reading and writing ZIP files in ZIP 64 format.
 
-## Prerequisites
-
-For building the binaries, Java JDK (1.8 or higher) must be installed. 
+## Getting started (for developers)
+For building the binaries, Java JDK 17 must be installed. 
 
 ### Run all tests
 ```shell
@@ -16,16 +14,20 @@ For building the binaries, Java JDK (1.8 or higher) must be installed.
 ./gradlew clean build
 ```
 
-### Create a release
-This creates a new tag and pushes the tag to main branch.
+### Versioning, tags, and releases
+Versions and tags are managed with the [Axion Release Plugin](https://github.com/allegro/axion-release-plugin) for Gradle.
+
+Short overview:
 ```shell
-./gradlew release
+./gradlew currentVersion  # Shows the current version
+
+./gradlew release         # Creates a new release, adds a tag, and pushes it to remote
 ```
 
 ## Documentation
-- [User's Manual](./doc/manual/user/index.html)
-- [Developer's Manual](./doc/manual/developer/index.html)
+- [User Manual](https://github.com/sfa-siard/siard-suite/blob/main/docs/user-manual/en/user-manual.adoc)
+- [Software Architecture Document](https://github.com/sfa-siard/siard-suite/blob/main/docs/sad/sad.adoc)
 
 ## Declaration
-Contributions to the codebase have been made with the support of Codeium. Codeium is AI-powered code completion tool, that is trained exclusively on natural language and source code data with [permissive licenses](https://codeium.com/blog/copilot-trains-on-gpl-codeium-does-not ). 
+Contributions to the codebase have been made with the support of Windsurf. Windsurf is AI-powered code completion tool, that is trained exclusively on natural language and source code data with [permissive licenses](https://windsurf.com/blog/copilot-trains-on-gpl-codeium-does-not). 
 
