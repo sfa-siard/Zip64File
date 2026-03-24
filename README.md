@@ -1,3 +1,9 @@
+> **⚠️ ARCHIVED REPOSITORY**  
+> This repository is archived and no longer maintained. All development has moved to the new monorepo:  
+> **https://github.com/sfa-siard/siard-suite**  
+> 
+> Please create any issues or pull requests in the new monorepo, which now contains all submodules including this one.
+
 # Zip64File - SIARD 2.2 ZIP 64 handler
 This package contains a ZIP 64 handler. Its main purpose is reading and writing ZIP files which conform to the 64 bit extension of the ZIP standard. It also includes a command-line tool for reading and writing ZIP files in ZIP 64 format.
 
